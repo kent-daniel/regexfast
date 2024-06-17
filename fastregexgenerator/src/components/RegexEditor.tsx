@@ -1,6 +1,12 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { Match, getRegexMatches } from "../actions/actions";
+import { Roboto_Mono } from "next/font/google";
+import { CopyInput } from "./CopyInput";
+export const roboto_mono = Roboto_Mono({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 const RegexEditor: React.FC = () => {
   const [regexPattern, setRegexPattern] = useState("");
@@ -14,20 +20,27 @@ const RegexEditor: React.FC = () => {
   }, [regexPattern, inputText]);
 
   const handleRegexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const pattern = e.target.value;
+    const pattern = `${e.target.value}`;
     setRegexPattern(pattern);
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLDivElement>) => {
     const text = e.target.innerText;
     setInputText(text);
+    console.log(contentEditableRef);
+  };
+
+  const handleScroll = () => {
+    if (highlightedRef.current && contentEditableRef.current) {
+      highlightedRef.current.scrollTop = contentEditableRef.current.scrollTop;
+    }
   };
 
   const fetchMatchesAndHighlight = async (pattern: string, text: string) => {
     try {
       if (text.length === 0 || pattern.length === 0) {
         if (highlightedRef.current) {
-          highlightedRef.current.innerHTML = escapeHtml(text);
+          highlightedRef.current.innerHTML = formatHtml(text);
         }
         return;
       }
@@ -53,18 +66,18 @@ const RegexEditor: React.FC = () => {
       const { index, text: matchText } = match;
       const beforeMatch = text.substring(lastIndex, index);
 
-      html += `${escapeHtml(
+      html += `${formatHtml(
         beforeMatch
-      )}<span class="bg-yellow-200">${escapeHtml(matchText)}</span>`;
+      )}<span class="bg-blue-300 rounded-sm">${formatHtml(matchText)}</span>`;
       lastIndex = index + matchText.length;
     });
 
-    html += escapeHtml(text.substring(lastIndex));
+    html += `A${formatHtml(text.substring(lastIndex))}A`;
     return html;
   };
 
-  const escapeHtml = (unsafe: string) => {
-    return unsafe.replace(/[&<"']/g, (match) => {
+  const formatHtml = (unsafe: string) => {
+    const cleanHtml = unsafe.replace(/[&<"']/g, (match) => {
       switch (match) {
         case "&":
           return "&amp;";
@@ -78,35 +91,36 @@ const RegexEditor: React.FC = () => {
           return match;
       }
     });
+    return cleanHtml;
   };
 
+  // TODO: newline when wrap text when reached maxwidth
   return (
-    <div className="p-4 max-w-lg mx-auto bg-white shadow-md rounded-md">
-      <h2 className="text-lg font-semibold mb-4">Regex Editor</h2>
+    <div className={`p-4 w-full ${roboto_mono.className}`}>
+      <h2 className="text-gray-300 mb-10 border-gray-600 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
+        Regex Editor
+      </h2>
       <label
-        htmlFor="regex"
-        className="block mb-2 text-sm font-medium text-gray-700"
+        htmlFor="text"
+        className="block mb-2 text-sm font-medium text-gray-300"
       >
-        Regex Pattern:
+        Text to Match:
       </label>
-      <input
-        type="text"
-        id="regex"
-        className="w-full px-3 py-2 mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-        placeholder="regex pattern"
+      <CopyInput
+        placeholder="Regex pattern"
         value={regexPattern}
         onChange={handleRegexChange}
       />
       <label
         htmlFor="text"
-        className="block mb-2 text-sm font-medium text-gray-700"
+        className="block mb-2 text-sm font-medium text-gray-300"
       >
         Text to Match:
       </label>
       <div className="relative w-full">
         <div
           ref={contentEditableRef}
-          contentEditable
+          contentEditable="plaintext-only"
           onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
             if (e.key === "Enter") {
               e.preventDefault(); // Prevent inserting new lines
@@ -114,8 +128,9 @@ const RegexEditor: React.FC = () => {
           }}
           onInput={handleTextChange}
           className="w-full px-3 py-2 mb-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:border-blue-500 whitespace-pre-wrap bg-transparent z-10 overflow-none"
+          onScroll={handleScroll}
           style={{
-            minHeight: "100px",
+            minHeight: "300px",
             position: "relative",
             maxHeight: "400px",
           }}
@@ -123,7 +138,10 @@ const RegexEditor: React.FC = () => {
         <div
           ref={highlightedRef}
           className="w-full px-3 py-2 mb-3 border border-transparent rounded-md resize-none focus:outline-none whitespace-pre-wrap pointer-events-none absolute top-0 left-0 bg-white z-0"
-          style={{ minHeight: "100px", maxHeight: "400px", overflow: "hidden" }}
+          style={{
+            minHeight: "300px",
+            maxHeight: "400px",
+          }}
           aria-hidden="true"
         ></div>
       </div>
@@ -132,30 +150,3 @@ const RegexEditor: React.FC = () => {
 };
 
 export default RegexEditor;
-
-// TODO:
-// Highlight in text
-// do UX like
-// generate me regex to find / check content inside html tags
-// in :
-// <html> abc <a>ttt</a> <body><p>lorem ipsum</p></body></html>
-// it should match:
-// abc ttt lorem ipsum
-// it should not match:
-// <p>lorem ipsum</p> abc <a>ttt</a> <body><p>lorem ipsum</p></body>
-
-// clear button for both text to match & regex pattern
-// font to be more code like
-// copy pastable fields
-// limit for textfield chars
-// excecute regex -> if null -> feedback to ai -> keep going for 3 times , if none , output the last one , warn user
-// read how to boost SEO in nextjs
-// setup server & deploy to EC2 (ask lasith)
-// section for common regexes for SEO
-// setup posthog , sentry
-// darkmode
-// setup domain , hosting
-// launch & GTM 🚀
-// setup google ads (later)
-// support for other languages (later)
-// explain feature (later)
