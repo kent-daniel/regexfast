@@ -47,7 +47,7 @@ export default function Home() {
         </div>
 
         <div className="flex basis-3/5 items-center">
-          <div className="m-5 h-full min-h-[1em] w-0.5 self-stretch bg-gradient-to-tr from-transparent via-neutral-500 to-transparent opacity-75 dark:via-neutral-200"></div>
+          <div className="m-5 h-full min-h-[1em] w-0.5 self-stretch bg-gradient-to-tr from-transparent via-indigo-500 to-transparent opacity-75 dark:via-neutral-200"></div>
           <RegexEditor />
         </div>
       </div>

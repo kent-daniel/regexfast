@@ -8,10 +8,11 @@ export interface Match {
 
 export async function getRegexMatches(
   pattern: string,
-  text: string
+  text: string,
+  flag: string
 ): Promise<Match[]> {
   try {
-    const regex = new RegExp(pattern, "g");
+    const regex = new RegExp(pattern, flag);
     const matches: Match[] = [];
     let match;
 

@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Match, getRegexMatches } from "../actions/actions";
 import { Roboto_Mono } from "next/font/google";
 import { CopyInput } from "./CopyInput";
+import RegexEditorOptions from "./RegexEditorOptions";
 export const roboto_mono = Roboto_Mono({
   subsets: ["latin"],
   display: "swap",
@@ -11,13 +12,15 @@ export const roboto_mono = Roboto_Mono({
 const RegexEditor: React.FC = () => {
   const [regexPattern, setRegexPattern] = useState("");
   const [inputText, setInputText] = useState("");
+  const [flags, setFlags] = useState<string[]>(["g"]);
+  const [language, setLanguage] = useState<string>("");
 
   const contentEditableRef = useRef<HTMLDivElement>(null);
   const highlightedRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchMatchesAndHighlight(regexPattern, inputText);
-  }, [regexPattern, inputText]);
+  }, [regexPattern, inputText, flags]);
 
   const handleRegexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const pattern = `${e.target.value}`;
@@ -27,7 +30,6 @@ const RegexEditor: React.FC = () => {
   const handleTextChange = (e: React.ChangeEvent<HTMLDivElement>) => {
     const text = e.target.innerText;
     setInputText(text);
-    console.log(contentEditableRef);
   };
 
   const handleScroll = () => {
@@ -45,7 +47,7 @@ const RegexEditor: React.FC = () => {
         return;
       }
 
-      const matches = await getRegexMatches(pattern, text);
+      const matches = await getRegexMatches(pattern, text, flags.join(""));
       highlightMatches(text, matches);
     } catch (error) {
       console.error("Error while fetching matches:", error);
@@ -72,7 +74,7 @@ const RegexEditor: React.FC = () => {
       lastIndex = index + matchText.length;
     });
 
-    html += `A${formatHtml(text.substring(lastIndex))}A`;
+    html += formatHtml(text.substring(lastIndex));
     return html;
   };
 
@@ -100,22 +102,29 @@ const RegexEditor: React.FC = () => {
       <h2 className="text-gray-300 mb-10 border-gray-600 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
         Regex Editor
       </h2>
-      <label
-        htmlFor="text"
-        className="block mb-2 text-sm font-medium text-gray-300"
-      >
-        Text to Match:
-      </label>
+
+      <div className="flex items-center justify-between mb-3">
+        <label
+          htmlFor="text"
+          className="block text-md font-medium text-gray-300"
+        >
+          Regex Options:
+        </label>
+        <RegexEditorOptions setFlags={setFlags} setLanguage={setLanguage} />
+      </div>
+
       <CopyInput
+        delimiter="\"
+        option={flags.join("")}
         placeholder="Regex pattern"
         value={regexPattern}
         onChange={handleRegexChange}
       />
       <label
         htmlFor="text"
-        className="block mb-2 text-sm font-medium text-gray-300"
+        className="block mb-2 text-md font-medium text-gray-300"
       >
-        Text to Match:
+        Text Matches:
       </label>
       <div className="relative w-full">
         <div

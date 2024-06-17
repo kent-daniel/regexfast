@@ -1,19 +1,21 @@
 "use client";
 import React, { useState } from "react";
-import { CopyIcon, CopyIconSuccess } from "./icons/CopyIcon";
+import { CopyIcon, CopyIconSuccess } from "./icons/Icons";
 
 interface CopyInputProps {
   value: string;
+  delimiter: string;
+  option: string;
   placeholder: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  width?: string; // Optional width prop
 }
 
 export const CopyInput: React.FC<CopyInputProps> = ({
   value,
   placeholder,
+  delimiter,
+  option,
   onChange,
-  width = "100%",
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -28,21 +30,28 @@ export const CopyInput: React.FC<CopyInputProps> = ({
       }
     );
   };
-  // TODO: set delimiter & regex flags
   return (
-    <div className="relative flex items-center justify-between w-full">
-      <input
-        type="text"
-        className="flex-grow px-3 py-2 mb-3 border-none focus:outline-none focus:border-blue-500"
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-      />
+    <div className="relative flex items-center w-full mb-2">
+      <div className="bg-gray-100 rounded-l-md flex items-center grow">
+        <div className="text-lg px-2 text-gray-500">
+          <span>{delimiter}</span>
+        </div>
+        <input
+          type="text"
+          className={`flex-grow px-3 h-[40px] py-2 border-none bg-transparent focus:outline-none`}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+        />
+        <div className="text-lg px-2 text-gray-500">
+          <span>{delimiter + option}</span>
+        </div>
+      </div>
       <button
         onClick={copyToClipboard}
-        className={`text-xs w-[100px] text-base px-3 py-2 mb-3 ml-3 text-white transition-transform ${
-          copied ? `bg-blue-500 scale-110` : `bg-zinc-500`
-        } rounded-md focus:outline-none`}
+        className={`text-xs w-[100px] h-[40px] border-none rounded-r-md rounded-l-none text-base px-3 py-2 text-white ${
+          copied ? `bg-indigo-500` : `bg-zinc-500`
+        } focus:outline-none`}
       >
         {copied ? (
           <div className=" flex items-center justify-center">
