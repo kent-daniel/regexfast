@@ -78,7 +78,7 @@ const RegexEditorOptions: React.FC<RegexEditorOptionsProps> = ({
                 <ToggleGroupItem
                   value={flag.value}
                   aria-label={`Toggle ${flag.label.toLowerCase()}`}
-                  className={`bg-gray-400 ${
+                  className={`bg-slate-400 ${
                     index === 0 ? "rounded-l rounded-r-none border-r" : ""
                   } ${
                     index === flags.length - 1
