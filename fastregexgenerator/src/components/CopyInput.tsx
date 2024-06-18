@@ -52,7 +52,7 @@ export const CopyInput: React.FC<CopyInputProps> = ({
       </div>
       <button
         onClick={copyToClipboard}
-        className={`text-xs w-[100px] h-[40px] border-none rounded-r-md rounded-l-none text-base px-3 py-2 text-white ${
+        className={`text-xs w-[100px] h-[40px] border-none rounded-r-md rounded-l-none px-3 py-2 text-white ${
           copied ? `bg-indigo-500` : `bg-zinc-500`
         } focus:outline-none`}
       >
