@@ -1,52 +1,59 @@
 import RegexEditor from "@/components/RegexEditor";
+import { MagicButton } from "@/components/ui/MagicButton";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="min-h-screen p-4">
-      <div className="flex w-full justify-center">
-        <div className="bg-gray-100 p-4 basis-2/5">
-          <h2 className="text-xl font-bold mb-4">Form</h2>
-          {/* Add your form elements here */}
+    <main className="min-h-screen p-2">
+      <div className="flex w-full justify-center text-gray-300">
+        <div className="basis-1/3 ">
+          <h1 className="text-2xl font-bold mb-5 border-gray-600 pb-2 border-b tracking-tight">
+            Regex Generator 💻
+          </h1>
           <form>
             <div className="mb-4">
-              <label
-                className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="input1"
-              >
-                Input 1
+              <label className="block text-sm font-bold mb-3">
+                I want to generate regex for
               </label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="input1"
-                type="text"
-                placeholder="Enter text"
+              <Textarea
+                required
+                placeholder="Matching phone numbers"
+                className="text-sm max-h-12 bg-zinc-800"
               />
             </div>
             <div className="mb-4">
-              <label
-                className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="input2"
-              >
-                Input 2
+              <label className="block text-sm font-bold mb-3">
+                It should match strings like
               </label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="input2"
-                type="text"
-                placeholder="Enter text"
+              <Textarea
+                required
+                placeholder="+919367788755 ,8989829304"
+                className="text-sm max-h-12 bg-zinc-800"
               />
             </div>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="button"
-            >
-              Submit
-            </button>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-3">
+                It should NOT match strings like
+              </label>
+              <Textarea
+                placeholder="789 ,123765 ,1-1-1"
+                className="text-sm max-h-12 bg-zinc-800"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-3">More info</label>
+              <Textarea
+                placeholder="Match a phone number with - and/or country code."
+                className="text-sm max-h-12 bg-zinc-800"
+              />
+            </div>
+            <MagicButton text="Generate 🔮" className="w-full mt-2" />
           </form>
         </div>
 
-        <div className="flex basis-3/5 items-center">
+        <div className="flex basis-2/3">
           <div className="m-5 h-full min-h-[1em] w-0.5 self-stretch bg-gradient-to-tr from-transparent via-indigo-500 to-transparent opacity-75 dark:via-neutral-200"></div>
           <RegexEditor />
         </div>

@@ -40,7 +40,7 @@ export const CopyInput: React.FC<CopyInputProps> = ({
         </div>
         <input
           type="text"
-          className={`flex-grow px-3 h-[40px] py-2 border-none bg-transparent focus:outline-none`}
+          className={`flex-grow h-[40px] py-2 border-none bg-transparent focus:outline-none text-gray-800`}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
