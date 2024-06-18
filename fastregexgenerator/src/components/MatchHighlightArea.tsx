@@ -42,7 +42,9 @@ export const MatchHighlightArea: React.FC<MatchHighlightAreaProps> = ({
 
       html += `${formatHtml(
         beforeMatch
-      )}<span class="bg-indigo-300 rounded-sm">${formatHtml(matchText)}</span>`;
+      )}<span class="bg-indigo-500/75 rounded-sm">${formatHtml(
+        matchText
+      )}</span>`;
       lastIndex = index + matchText.length;
     });
 
@@ -69,18 +71,6 @@ export const MatchHighlightArea: React.FC<MatchHighlightAreaProps> = ({
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // const CHARACTER_LIMIT = 1000;
-    // if (contentEditableRef.current) {
-    //   const currentText = contentEditableRef.current.innerText;
-    //   if (currentText.length > CHARACTER_LIMIT) {
-    //     contentEditableRef.current.innerText = currentText.substring(
-    //       0,
-    //       CHARACTER_LIMIT
-    //     );
-    //     e.preventDefault();
-    //     return;
-    //   }
-    // }
     onTextChange(e);
   };
 
@@ -89,33 +79,28 @@ export const MatchHighlightArea: React.FC<MatchHighlightAreaProps> = ({
   }, [text, matches]);
 
   return (
-    <>
+    <div className="text-gray-300">
       <div
         ref={contentEditableRef}
         contentEditable="plaintext-only"
-        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Enter") {
-            e.preventDefault(); // Prevent inserting new lines
-          }
-        }}
         onInput={handleInput}
-        className="w-full px-3 py-2 mb-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:border-blue-500 whitespace-pre-wrap bg-transparent z-10 overflow-none"
+        className="w-full px-3 py-2 mb-3 border rounded-md resize-none focus:outline-none focus:border-indigo-400 whitespace-pre-wrap bg-transparent z-10 overflow-y-scroll break-words"
         onScroll={handleScroll}
         style={{
-          minHeight: "300px",
+          minHeight: "250px",
           position: "relative",
           maxHeight: "400px",
         }}
       ></div>
       <div
         ref={highlightedRef}
-        className="w-full px-3 py-2 mb-3 border border-transparent rounded-md resize-none focus:outline-none whitespace-pre-wrap pointer-events-none absolute top-0 left-0 bg-white z-0"
+        className="w-full px-3 py-2 mb-3 border border-transparent rounded-md resize-none focus:outline-none whitespace-pre-wrap pointer-events-none absolute top-0 left-0 bg-zinc-800 z-0 overflow-y-scroll break-words"
         style={{
-          minHeight: "300px",
+          minHeight: "250px",
           maxHeight: "400px",
         }}
         aria-hidden="true"
       ></div>
-    </>
+    </div>
   );
 };
