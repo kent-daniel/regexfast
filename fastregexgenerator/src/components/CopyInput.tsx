@@ -20,15 +20,17 @@ export const CopyInput: React.FC<CopyInputProps> = ({
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(`${delimiter}value${delimiter}${flags}`).then(
-      () => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1200);
-      },
-      (err) => {
-        console.error("Failed to copy to clipboard", err);
-      }
-    );
+    navigator.clipboard
+      .writeText(`${delimiter}${value}${delimiter}${flags}`)
+      .then(
+        () => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1200);
+        },
+        (err) => {
+          console.error("Failed to copy to clipboard", err);
+        }
+      );
   };
   return (
     <div className="relative flex items-center w-full mb-2">
