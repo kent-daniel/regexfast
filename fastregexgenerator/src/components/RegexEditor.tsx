@@ -4,25 +4,40 @@ import { Match, getRegexMatches } from "../actions/actions";
 import { Roboto_Mono } from "next/font/google";
 import { CopyInput } from "./CopyInput";
 import RegexEditorOptions from "./RegexEditorOptions";
+import { MatchHighlightArea } from "./MatchHighlightArea";
 
 export const roboto_mono = Roboto_Mono({
   subsets: ["latin"],
   display: "swap",
 });
 
-const RegexEditor: React.FC = () => {
-  const [regexPattern, setRegexPattern] = useState("");
-  const [inputText, setInputText] = useState("");
-  const [flags, setFlags] = useState<string[]>(["g"]);
-  const [delimiter, setDelimiter] = useState<string>("/");
-  const [language, setLanguage] = useState<string>("");
+export interface RegexEditorBaseProps {
+  regexPattern?: string;
+  inputText?: string;
+  flags?: string[];
+  delimiter?: string;
+  language?: string;
+  matches?: Match[];
+}
 
-  const contentEditableRef = useRef<HTMLDivElement>(null);
-  const highlightedRef = useRef<HTMLDivElement>(null);
+const RegexEditor: React.FC<RegexEditorBaseProps> = ({
+  regexPattern: initialRegexPattern = "",
+  inputText: initialInputText = "",
+  flags: initialFlags = ["g"],
+  delimiter: initialDelimiter = "/",
+  language: initialLanguage = "js",
+  matches: initialMatches = [],
+}) => {
+  const [regexPattern, setRegexPattern] = useState(initialRegexPattern);
+  const [inputText, setInputText] = useState(initialInputText);
+  const [flags, setFlags] = useState<string[]>(initialFlags);
+  const [delimiter, setDelimiter] = useState<string>(initialDelimiter);
+  const [language, setLanguage] = useState<string>(initialLanguage);
+  const [matches, setMatches] = useState<Match[]>(initialMatches);
 
   useEffect(() => {
-    fetchMatchesAndHighlight(regexPattern, inputText, flags.join(""));
-  }, [regexPattern, inputText, flags]);
+    fetchMatches(regexPattern, inputText, flags.join(""));
+  }, [regexPattern, inputText, flags, language]);
 
   const handleRegexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const pattern = `${e.target.value}`;
@@ -34,71 +49,13 @@ const RegexEditor: React.FC = () => {
     setInputText(text);
   };
 
-  const handleScroll = () => {
-    if (highlightedRef.current && contentEditableRef.current) {
-      highlightedRef.current.scrollTop = contentEditableRef.current.scrollTop;
-    }
-  };
-
-  const fetchMatchesAndHighlight = async (
-    pattern: string,
-    text: string,
-    flags: string
-  ) => {
+  const fetchMatches = async (pattern: string, text: string, flags: string) => {
     try {
-      if (text.length === 0 || pattern.length === 0) {
-        if (highlightedRef.current) {
-          highlightedRef.current.innerHTML = formatHtml(text);
-        }
-        return;
-      }
-      const matches = await getRegexMatches(pattern, text, flags);
-      highlightMatches(text, matches);
+      const matches = await getRegexMatches(pattern, text, flags, language);
+      setMatches(matches);
     } catch (error) {
       console.error("Error while fetching matches:", error);
     }
-  };
-
-  const highlightMatches = (text: string, matches: Match[]) => {
-    const highlightedHtml = generateHighlightedHtml(text, matches);
-    if (highlightedRef.current) {
-      highlightedRef.current.innerHTML = highlightedHtml;
-    }
-  };
-
-  const generateHighlightedHtml = (text: string, matches: Match[]): string => {
-    let html = "";
-    let lastIndex = 0;
-    matches.forEach((match) => {
-      const { index, text: matchText } = match;
-      const beforeMatch = text.substring(lastIndex, index);
-
-      html += `${formatHtml(
-        beforeMatch
-      )}<span class="bg-indigo-300 rounded-sm">${formatHtml(matchText)}</span>`;
-      lastIndex = index + matchText.length;
-    });
-
-    html += formatHtml(text.substring(lastIndex));
-    return html;
-  };
-
-  const formatHtml = (unsafe: string) => {
-    const cleanHtml = unsafe.replace(/[&<"']/g, (match) => {
-      switch (match) {
-        case "&":
-          return "&amp;";
-        case "<":
-          return "&lt;";
-        case '"':
-          return "&quot;";
-        case "'":
-          return "&#039;";
-        default:
-          return match;
-      }
-    });
-    return cleanHtml;
   };
 
   // TODO: newline when wrap text when reached maxwidth
@@ -107,7 +64,6 @@ const RegexEditor: React.FC = () => {
       <h2 className="text-gray-300 mb-10 border-gray-600 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
         Regex Editor
       </h2>
-
       <div className="flex items-center justify-between mb-3">
         <label
           htmlFor="text"
@@ -117,7 +73,6 @@ const RegexEditor: React.FC = () => {
         </label>
         <RegexEditorOptions setFlags={setFlags} setLanguage={setLanguage} />
       </div>
-
       <CopyInput
         delimiter={delimiter}
         flags={flags.join("")}
@@ -131,33 +86,12 @@ const RegexEditor: React.FC = () => {
       >
         Text Matches:
       </label>
-      <div className="relative w-full">
-        <div
-          ref={contentEditableRef}
-          contentEditable="plaintext-only"
-          onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-            if (e.key === "Enter") {
-              e.preventDefault(); // Prevent inserting new lines
-            }
-          }}
-          onInput={handleTextChange}
-          className="w-full px-3 py-2 mb-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:border-blue-500 whitespace-pre-wrap bg-transparent z-10 overflow-none"
-          onScroll={handleScroll}
-          style={{
-            minHeight: "300px",
-            position: "relative",
-            maxHeight: "400px",
-          }}
-        ></div>
-        <div
-          ref={highlightedRef}
-          className="w-full px-3 py-2 mb-3 border border-transparent rounded-md resize-none focus:outline-none whitespace-pre-wrap pointer-events-none absolute top-0 left-0 bg-white z-0"
-          style={{
-            minHeight: "300px",
-            maxHeight: "400px",
-          }}
-          aria-hidden="true"
-        ></div>
+      <div className="relative max-w-[600px]">
+        <MatchHighlightArea
+          onTextChange={handleTextChange}
+          text={inputText}
+          matches={matches}
+        />
       </div>
     </div>
   );

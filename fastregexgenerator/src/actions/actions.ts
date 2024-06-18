@@ -9,14 +9,19 @@ export interface Match {
 export async function getRegexMatches(
   pattern: string,
   text: string,
-  flag: string
+  flag: string,
+  language: string
 ): Promise<Match[]> {
   try {
+    const lan: string = language;
     const regex = new RegExp(pattern, flag || "");
     const matches: Match[] = [];
-    const match = regex.exec(text);
 
-    if (!flag && match) {
+    if (text.length === 0 || pattern.length === 0) {
+      return [];
+    }
+    const match = regex.exec(text);
+    if (!flag.includes("g") && match) {
       return [{ index: match.index, text: match[0] }];
     }
 
@@ -29,6 +34,6 @@ export async function getRegexMatches(
     return matches;
   } catch (error) {
     console.error("Error in getRegexMatches:", error);
-    throw new Error("Internal server error");
+    return [];
   }
 }
