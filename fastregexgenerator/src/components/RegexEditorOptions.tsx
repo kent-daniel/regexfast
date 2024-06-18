@@ -57,11 +57,6 @@ const flags: Flag[] = [
     value: "u",
     label: "Unicode - Treats the pattern as a sequence of Unicode code points.",
   },
-  {
-    value: "y",
-    label:
-      "Sticky - Matches only from the index indicated by the lastIndex property.",
-  },
 ];
 
 const RegexEditorOptions: React.FC<RegexEditorOptionsProps> = ({
@@ -72,7 +67,7 @@ const RegexEditorOptions: React.FC<RegexEditorOptionsProps> = ({
     <div className="flex justify-end items-center">
       <ToggleGroup
         type="multiple"
-        className="w-[250px] flex p-1 mx-2"
+        className="w-[180px] flex p-1 mx-2"
         defaultValue={["g"]}
         onValueChange={(values) => setFlags(values)}
       >
@@ -105,13 +100,9 @@ const RegexEditorOptions: React.FC<RegexEditorOptionsProps> = ({
           ))}
         </TooltipProvider>
       </ToggleGroup>
-      <Select onValueChange={setLanguage}>
+      <Select onValueChange={setLanguage} value={"js"}>
         <SelectTrigger className="w-[160px] text-gray-300">
-          <SelectValue
-            defaultValue="js"
-            className="text-gray-300"
-            placeholder="Language"
-          />
+          <SelectValue />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
