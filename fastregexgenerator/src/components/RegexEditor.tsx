@@ -4,6 +4,7 @@ import { Match, getRegexMatches } from "../actions/actions";
 import { Roboto_Mono } from "next/font/google";
 import { CopyInput } from "./CopyInput";
 import RegexEditorOptions from "./RegexEditorOptions";
+
 export const roboto_mono = Roboto_Mono({
   subsets: ["latin"],
   display: "swap",
@@ -13,13 +14,14 @@ const RegexEditor: React.FC = () => {
   const [regexPattern, setRegexPattern] = useState("");
   const [inputText, setInputText] = useState("");
   const [flags, setFlags] = useState<string[]>(["g"]);
+  const [delimiter, setDelimiter] = useState<string>("/");
   const [language, setLanguage] = useState<string>("");
 
   const contentEditableRef = useRef<HTMLDivElement>(null);
   const highlightedRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchMatchesAndHighlight(regexPattern, inputText);
+    fetchMatchesAndHighlight(regexPattern, inputText, flags.join(""));
   }, [regexPattern, inputText, flags]);
 
   const handleRegexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +40,11 @@ const RegexEditor: React.FC = () => {
     }
   };
 
-  const fetchMatchesAndHighlight = async (pattern: string, text: string) => {
+  const fetchMatchesAndHighlight = async (
+    pattern: string,
+    text: string,
+    flags: string
+  ) => {
     try {
       if (text.length === 0 || pattern.length === 0) {
         if (highlightedRef.current) {
@@ -46,8 +52,7 @@ const RegexEditor: React.FC = () => {
         }
         return;
       }
-
-      const matches = await getRegexMatches(pattern, text, flags.join(""));
+      const matches = await getRegexMatches(pattern, text, flags);
       highlightMatches(text, matches);
     } catch (error) {
       console.error("Error while fetching matches:", error);
@@ -70,7 +75,7 @@ const RegexEditor: React.FC = () => {
 
       html += `${formatHtml(
         beforeMatch
-      )}<span class="bg-blue-300 rounded-sm">${formatHtml(matchText)}</span>`;
+      )}<span class="bg-indigo-300 rounded-sm">${formatHtml(matchText)}</span>`;
       lastIndex = index + matchText.length;
     });
 
@@ -114,8 +119,8 @@ const RegexEditor: React.FC = () => {
       </div>
 
       <CopyInput
-        delimiter="\"
-        option={flags.join("")}
+        delimiter={delimiter}
+        flags={flags.join("")}
         placeholder="Regex pattern"
         value={regexPattern}
         onChange={handleRegexChange}

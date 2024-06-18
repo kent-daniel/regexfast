@@ -5,7 +5,7 @@ import { CopyIcon, CopyIconSuccess } from "./icons/Icons";
 interface CopyInputProps {
   value: string;
   delimiter: string;
-  option: string;
+  flags: string;
   placeholder: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -14,13 +14,13 @@ export const CopyInput: React.FC<CopyInputProps> = ({
   value,
   placeholder,
   delimiter,
-  option,
+  flags,
   onChange,
 }) => {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(value).then(
+    navigator.clipboard.writeText(`${delimiter}value${delimiter}${flags}`).then(
       () => {
         setCopied(true);
         setTimeout(() => setCopied(false), 1200);
@@ -44,7 +44,10 @@ export const CopyInput: React.FC<CopyInputProps> = ({
           onChange={onChange}
         />
         <div className="text-lg px-2 text-gray-500">
-          <span>{delimiter + option}</span>
+          <span>
+            {delimiter}
+            {flags || ""}
+          </span>
         </div>
       </div>
       <button

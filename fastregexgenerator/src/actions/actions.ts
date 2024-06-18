@@ -12,17 +12,23 @@ export async function getRegexMatches(
   flag: string
 ): Promise<Match[]> {
   try {
-    const regex = new RegExp(pattern, flag);
+    const regex = new RegExp(pattern, flag || "");
     const matches: Match[] = [];
-    let match;
+    const match = regex.exec(text);
 
-    while ((match = regex.exec(text)) !== null) {
-      matches.push({ index: match.index, text: match[0] });
+    if (!flag && match) {
+      return [{ index: match.index, text: match[0] }];
+    }
+
+    let currentMatch = match;
+    while (currentMatch !== null) {
+      matches.push({ index: currentMatch.index, text: currentMatch[0] });
+      currentMatch = regex.exec(text);
     }
 
     return matches;
   } catch (error) {
-    console.error("Error while matching regex:", error);
+    console.error("Error in getRegexMatches:", error);
     throw new Error("Internal server error");
   }
 }
