@@ -1,16 +1,16 @@
+import Hero from "@/components/Hero";
 import RegexEditor from "@/components/RegexEditor";
 import { MagicButton } from "@/components/ui/MagicButton";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import Image from "next/image";
 
 export default function Home() {
   return (
     <main className="min-h-screen p-2">
-      <div className="flex w-full justify-center text-gray-300">
+      <Hero />
+      <div className="flex w-full justify-center text-gray-300 font-mono">
         <div className="basis-1/3 ">
           <h1 className="text-2xl font-bold mb-5 border-gray-600 pb-2 border-b tracking-tight">
-            Regex Generator 💻
+            Regex Generator
           </h1>
           <form>
             <div className="mb-4">
@@ -29,7 +29,7 @@ export default function Home() {
               </label>
               <Textarea
                 required
-                placeholder="+919367788755 ,8989829304"
+                placeholder="+619330489795 ,6089534304"
                 className="text-sm max-h-12 bg-zinc-800"
               />
             </div>
@@ -38,7 +38,7 @@ export default function Home() {
                 It should NOT match strings like
               </label>
               <Textarea
-                placeholder="789 ,123765 ,1-1-1"
+                placeholder="789 ,12345 ,1-1-1"
                 className="text-sm max-h-12 bg-zinc-800"
               />
             </div>
@@ -49,7 +49,10 @@ export default function Home() {
                 className="text-sm max-h-12 bg-zinc-800"
               />
             </div>
-            <MagicButton text="Generate 🔮" className="w-full mt-2" />
+            <MagicButton
+              text="Generate 🔮"
+              className="w-full mt-2 font-semibold"
+            />
           </form>
         </div>
 
