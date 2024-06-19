@@ -1,39 +1,44 @@
-// app/actions/matchRegex.ts
 "use server";
 
-export interface Match {
-  index: number;
-  text: string;
-}
+import { Match, RegexResultDTO } from "@/models";
+import {
+  generateRegexWithAIUseCase,
+  getRegexUseCase,
+} from "@/use-cases/use-cases";
 
 export async function getRegexMatches(
   pattern: string,
   text: string,
   flag: string,
-  language: string
+  language?: string
 ): Promise<Match[]> {
   try {
-    const lan: string = language;
-    const regex = new RegExp(pattern, flag || "");
-    const matches: Match[] = [];
-
+    console.log(pattern, text, flag);
     if (text.length === 0 || pattern.length === 0) {
       return [];
     }
-    const match = regex.exec(text);
-    if (!flag.includes("g") && match) {
-      return [{ index: match.index, text: match[0] }];
-    }
-
-    let currentMatch = match;
-    while (currentMatch !== null) {
-      matches.push({ index: currentMatch.index, text: currentMatch[0] });
-      currentMatch = regex.exec(text);
-    }
-
+    const matches = await getRegexUseCase(pattern, text, flag);
     return matches;
   } catch (error) {
     console.error("Error in getRegexMatches:", error);
     return [];
   }
+}
+
+export async function submitForm(formData: FormData): Promise<RegexResultDTO> {
+  // format form data
+  // description cannot be empty (spaces only)
+  // shouldMatch should be comma seperated and cannot be empty
+  // shouldNotMatch if not empty should be comma seperated
+  // info if not empty cannot be empty spaces like description
+  // send to usecase
+  const result = await generateRegexWithAIUseCase({
+    description: formData.get("description") as string,
+    shouldMatch: formData.get("shouldMatch")?.toString().split(",") || [],
+    shouldNotMatch: formData.get("shouldNotMatch")?.toString().split(",") || [],
+    info: formData.get("info") as string,
+  });
+
+  // format form data back
+  return result;
 }

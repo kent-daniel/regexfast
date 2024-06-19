@@ -1,33 +1,55 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Match, getRegexMatches } from "../actions/actions";
+import { getRegexMatches } from "../actions/actions";
 import { CopyInput } from "./CopyInput";
 import RegexEditorOptions from "./RegexEditorOptions";
 import { MatchHighlightArea } from "./MatchHighlightArea";
+import { Match, RegexResultDTO } from "@/models";
 
 export interface RegexEditorBaseProps {
-  regexPattern?: string;
-  inputText?: string;
-  flags?: string[];
-  delimiter?: string;
-  language?: string;
-  matches?: Match[];
+  regexPatternProp?: string;
+  inputTextProp?: string;
+  flagsProp?: string[];
+  delimiterProp?: string;
+  languageProp?: string;
+  matchesProp?: Match[];
 }
 
+var data: RegexResultDTO | null = {
+  pattern: "\\d+",
+  flags: ["g", "i"],
+  textForTest: "123",
+  success: true,
+};
+
 const RegexEditor: React.FC<RegexEditorBaseProps> = ({
-  regexPattern: initialRegexPattern = "",
-  inputText: initialInputText = "",
-  flags: initialFlags = ["g"],
-  delimiter: initialDelimiter = "/",
-  language: initialLanguage = "js",
-  matches: initialMatches = [],
+  regexPatternProp = "",
+  inputTextProp = "",
+  flagsProp = ["g"],
+  delimiterProp = "/",
+  languageProp = "js",
+  matchesProp = [],
 }) => {
-  const [regexPattern, setRegexPattern] = useState(initialRegexPattern);
-  const [inputText, setInputText] = useState(initialInputText);
-  const [flags, setFlags] = useState<string[]>(initialFlags);
-  const [delimiter, setDelimiter] = useState<string>(initialDelimiter);
-  const [language, setLanguage] = useState<string>(initialLanguage);
-  const [matches, setMatches] = useState<Match[]>(initialMatches);
+  const [regexPattern, setRegexPattern] = useState<string>(regexPatternProp);
+  const [inputText, setInputText] = useState<string>(inputTextProp);
+  const [flags, setFlags] = useState<string[]>(flagsProp);
+  const [delimiter, setDelimiter] = useState<string>(delimiterProp);
+  const [language, setLanguage] = useState<string>(languageProp);
+  const [matches, setMatches] = useState<Match[]>(matchesProp);
+
+  useEffect(() => {
+    // Update state when props change
+    if (data) {
+      console.log("called");
+      setRegexPattern(data.pattern);
+      setInputText(data.textForTest);
+      setFlags(data.flags);
+    }
+
+    return () => {
+      data = null;
+    };
+  }, []);
 
   useEffect(() => {
     fetchMatches(regexPattern, inputText, flags.join(""));
@@ -64,7 +86,11 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
         >
           Regex Options:
         </label>
-        <RegexEditorOptions setFlags={setFlags} setLanguage={setLanguage} />
+        <RegexEditorOptions
+          setFlags={setFlags}
+          defaultFlags={flags}
+          setLanguage={setLanguage}
+        />
       </div>
       <CopyInput
         delimiter={delimiter}

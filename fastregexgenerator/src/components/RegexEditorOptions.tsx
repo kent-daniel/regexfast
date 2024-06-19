@@ -32,6 +32,7 @@ interface Flag {
 
 interface RegexEditorOptionsProps {
   setFlags: (flags: string[]) => void;
+  defaultFlags: string[];
   setLanguage: (language: string) => void;
 }
 
@@ -61,6 +62,7 @@ const flags: Flag[] = [
 
 const RegexEditorOptions: React.FC<RegexEditorOptionsProps> = ({
   setFlags,
+  defaultFlags,
   setLanguage,
 }) => {
   return (
@@ -68,7 +70,7 @@ const RegexEditorOptions: React.FC<RegexEditorOptionsProps> = ({
       <ToggleGroup
         type="multiple"
         className="w-[180px] flex p-1 mx-2"
-        defaultValue={["g"]}
+        value={defaultFlags}
         onValueChange={(values) => setFlags(values)}
       >
         <TooltipProvider>

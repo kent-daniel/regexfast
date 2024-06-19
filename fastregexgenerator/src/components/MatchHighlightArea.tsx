@@ -1,6 +1,6 @@
 "use client";
-import { Match } from "@/actions/actions";
-import React, { useEffect, useMemo, useRef } from "react";
+import { Match } from "@/models";
+import React, { useEffect, useRef } from "react";
 
 interface MatchHighlightAreaProps {
   matches: Match[];
