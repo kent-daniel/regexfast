@@ -4,7 +4,7 @@ import { ArrowDownIcon } from "./icons/Icons";
 const Hero = () => {
   return (
     <div className="flex flex-col items-center justify-center  py-20 px-6 text-center">
-      <h1 className="mb-8 relative z-10 text-lg md:text-5xl bg-clip-text text-transparent bg-gradient-to-b from-gray-100 to-slate-400 text-center font-sans font-bold text-shadow-glow">
+      <h1 className="mb-8 relative z-10 text-3xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-b from-gray-100 to-slate-400 text-center font-sans font-bold text-shadow-glow">
         Generate, Test, and Edit Regular Expression patterns effortlessly with
         AI
       </h1>

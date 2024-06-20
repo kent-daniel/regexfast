@@ -13,7 +13,6 @@ export async function getRegexMatches(
   language?: string
 ): Promise<Match[]> {
   try {
-    console.log(pattern, text, flag);
     if (text.length === 0 || pattern.length === 0) {
       return [];
     }

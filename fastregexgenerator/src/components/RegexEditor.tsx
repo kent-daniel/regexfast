@@ -5,6 +5,7 @@ import { CopyInput } from "./CopyInput";
 import RegexEditorOptions from "./RegexEditorOptions";
 import { MatchHighlightArea } from "./MatchHighlightArea";
 import { Match, RegexResultDTO } from "@/models";
+import { useRegexResult } from "./RegexResultContext";
 
 export interface RegexEditorBaseProps {
   regexPatternProp?: string;
@@ -14,13 +15,6 @@ export interface RegexEditorBaseProps {
   languageProp?: string;
   matchesProp?: Match[];
 }
-
-var data: RegexResultDTO | null = {
-  pattern: "\\d+",
-  flags: ["g", "i"],
-  textForTest: "123",
-  success: true,
-};
 
 const RegexEditor: React.FC<RegexEditorBaseProps> = ({
   regexPatternProp = "",
@@ -37,23 +31,19 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
   const [language, setLanguage] = useState<string>(languageProp);
   const [matches, setMatches] = useState<Match[]>(matchesProp);
 
+  const { result, setResult } = useRegexResult();
+
   useEffect(() => {
-    // Update state when props change
-    if (data) {
-      console.log("called");
-      setRegexPattern(data.pattern);
-      setInputText(data.textForTest);
-      setFlags(data.flags);
+    if (result) {
+      setRegexPattern(result.pattern);
+      setInputText(result.textForTest);
+      setFlags(result.flags);
     }
-
-    return () => {
-      data = null;
-    };
-  }, []);
-
-  useEffect(() => {
     fetchMatches(regexPattern, inputText, flags.join(""));
-  }, [regexPattern, inputText, flags, language]);
+    return () => {
+      setResult(null);
+    };
+  }, [regexPattern, inputText, flags, language, result]);
 
   const handleRegexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const pattern = `${e.target.value}`;

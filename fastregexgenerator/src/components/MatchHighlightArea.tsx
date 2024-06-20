@@ -1,6 +1,7 @@
 "use client";
 import { Match } from "@/models";
 import React, { useEffect, useRef } from "react";
+import { useRegexResult } from "./RegexResultContext";
 
 interface MatchHighlightAreaProps {
   matches: Match[];
@@ -15,6 +16,7 @@ export const MatchHighlightArea: React.FC<MatchHighlightAreaProps> = ({
 }) => {
   const contentEditableRef = useRef<HTMLDivElement>(null);
   const highlightedRef = useRef<HTMLDivElement>(null);
+  const { result } = useRegexResult();
 
   const highlightMatches = (text: string, matches: Match[]): void => {
     if ((text.length === 0 || matches.length === 0) && highlightedRef.current) {
@@ -76,7 +78,10 @@ export const MatchHighlightArea: React.FC<MatchHighlightAreaProps> = ({
 
   useEffect(() => {
     highlightMatches(text, matches);
-  }, [text, matches]);
+    if (result && contentEditableRef.current) {
+      contentEditableRef.current.innerText = result.textForTest;
+    }
+  }, [text, matches, result]);
 
   return (
     <div className="text-gray-300">
@@ -84,7 +89,7 @@ export const MatchHighlightArea: React.FC<MatchHighlightAreaProps> = ({
         ref={contentEditableRef}
         contentEditable="plaintext-only"
         onInput={handleInput}
-        className="w-full px-3 py-2 mb-3 border rounded-md resize-none focus:outline-none focus:border-indigo-400 whitespace-pre-wrap bg-transparent z-10 overflow-y-scroll break-words"
+        className="w-full px-3 py-2 mb-3 border rounded-md text-transparent caret-indigo-300 resize-none focus:outline-none focus:border-indigo-400 whitespace-pre-wrap bg-transparent z-10 overflow-y-scroll break-words"
         onScroll={handleScroll}
         style={{
           minHeight: "250px",

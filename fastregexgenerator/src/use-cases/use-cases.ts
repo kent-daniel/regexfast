@@ -35,8 +35,8 @@ export async function generateRegexWithAIUseCase(
   await new Promise((res) => setTimeout(res, 1000));
   return {
     pattern: "\\d+",
-    flags: ["g", "i"],
-    textForTest: "123",
+    flags: ["g", "i", "s"],
+    textForTest: "123 , 123 , 123",
     success: true,
   };
 }

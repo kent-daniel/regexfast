@@ -4,12 +4,11 @@ import { MagicButton } from "./ui/MagicButton";
 import { Textarea } from "./ui/textarea";
 import { submitForm } from "@/actions/actions";
 import { RegexResultDTO } from "@/models";
+import { useRegexResult } from "./RegexResultContext";
 
-interface RegexGeneratorFormProps {
-  setResult: (result: RegexResultDTO) => void;
-}
-export const RegexGeneratorForm = ({ setResult }: RegexGeneratorFormProps) => {
+export const RegexGeneratorForm = () => {
   const ref = useRef<HTMLFormElement>(null);
+  const { setResult } = useRegexResult();
   return (
     <>
       <h1 className="text-2xl font-bold mb-5 border-gray-600 pb-2 border-b tracking-tight">
