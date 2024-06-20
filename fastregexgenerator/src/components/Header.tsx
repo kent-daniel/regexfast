@@ -30,9 +30,9 @@ export const Header = () => {
         <Image
           src={siteLogo}
           alt="Magic Regex Generator Logo"
-          className="w-[35px] h-[35px] rounded-lg mr-2"
-          width={35}
-          height={35}
+          className="w-[40px] h-[40px] rounded-full mr-2"
+          width={40}
+          height={40}
         />
         <p className="text-gray-200 text-xl font-bold">MagicRegexGenerator</p>
       </Link>

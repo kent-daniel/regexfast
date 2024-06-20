@@ -1,13 +1,15 @@
 "use client";
 import React, { useState } from "react";
 import { CopyIcon, CopyIconSuccess } from "./icons/Icons";
+import { cn } from "@/lib/utils";
 
 interface CopyInputProps {
   value: string;
   delimiter: string;
   flags: string;
-  placeholder: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  className?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const CopyInput: React.FC<CopyInputProps> = ({
@@ -15,6 +17,7 @@ export const CopyInput: React.FC<CopyInputProps> = ({
   placeholder,
   delimiter,
   flags,
+  className,
   onChange,
 }) => {
   const [copied, setCopied] = useState(false);
@@ -33,7 +36,7 @@ export const CopyInput: React.FC<CopyInputProps> = ({
       );
   };
   return (
-    <div className="relative flex items-center w-full mb-2">
+    <div className={cn(`relative flex items-center w-full mb-2`, className)}>
       <div className="bg-gray-100 rounded-l-md flex items-center grow">
         <div className="text-lg px-2 text-gray-500">
           <span>{delimiter}</span>

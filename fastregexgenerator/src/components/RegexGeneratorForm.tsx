@@ -25,7 +25,6 @@ export const RegexGeneratorForm = () => {
         action={async (formData) => {
           const result = await submitForm(formData);
           setResult(result);
-          ref.current?.reset();
         }}
         className="py-3"
       >
