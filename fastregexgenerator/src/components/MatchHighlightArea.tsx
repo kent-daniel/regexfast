@@ -89,7 +89,7 @@ export const MatchHighlightArea: React.FC<MatchHighlightAreaProps> = ({
         ref={contentEditableRef}
         contentEditable="plaintext-only"
         onInput={handleInput}
-        className="w-full px-3 py-2 mb-3 border rounded-md text-transparent caret-indigo-300 resize-none focus:outline-none focus:border-indigo-400 whitespace-pre-wrap bg-transparent z-10 overflow-y-scroll break-words"
+        className="w-full px-3 py-2 mb-3 border-none rounded-md text-transparent caret-indigo-300 resize-none focus:outline-none focus:border-indigo-400 whitespace-pre-wrap bg-transparent z-10 overflow-y-scroll break-words"
         onScroll={handleScroll}
         style={{
           minHeight: "250px",
@@ -99,7 +99,7 @@ export const MatchHighlightArea: React.FC<MatchHighlightAreaProps> = ({
       ></div>
       <div
         ref={highlightedRef}
-        className="w-full px-3 py-2 mb-3 border border-transparent rounded-md resize-none focus:outline-none whitespace-pre-wrap pointer-events-none absolute top-0 left-0 bg-zinc-800 z-0 overflow-y-scroll break-words"
+        className="w-full px-3 py-2 mb-3 border-none border-transparent rounded-md resize-none focus:outline-none whitespace-pre-wrap pointer-events-none absolute top-0 left-0 bg-zinc-800 z-0 overflow-y-scroll break-words"
         style={{
           minHeight: "250px",
           maxHeight: "400px",

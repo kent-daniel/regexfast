@@ -37,7 +37,7 @@ export const RegexGeneratorForm = () => {
               required
               name="description"
               placeholder="Matching phone numbers"
-              className="text-sm max-h-12 bg-zinc-800"
+              className="text-sm max-h-12 bg-zinc-800 border-none"
             />
           </div>
           <div className="mb-4">
@@ -59,7 +59,7 @@ export const RegexGeneratorForm = () => {
               required
               name="shouldMatch"
               placeholder="+619330489795 ,6089534304"
-              className="text-sm max-h-12 bg-zinc-800"
+              className="text-sm max-h-12 bg-zinc-800 border-none"
             />
           </div>
           <div className="mb-4">
@@ -80,7 +80,7 @@ export const RegexGeneratorForm = () => {
             <Textarea
               name="shouldNotMatch"
               placeholder="789 ,12345 ,1-1-1"
-              className="text-sm max-h-12 bg-zinc-800"
+              className="text-sm max-h-12 bg-zinc-800 border-none"
             />
           </div>
           <div className="mb-4">
@@ -88,7 +88,7 @@ export const RegexGeneratorForm = () => {
             <Textarea
               name="info"
               placeholder="Match a phone number with - and/or country code."
-              className="text-sm max-h-12 bg-zinc-800"
+              className="text-sm max-h-12 bg-zinc-800 border-none"
             />
           </div>
         </TooltipProvider>
