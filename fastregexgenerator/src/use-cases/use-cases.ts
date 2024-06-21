@@ -18,7 +18,7 @@ export async function getRegexUseCase(
     // Handle global flag case
     let currentMatch = match;
     while (currentMatch) {
-      if (currentMatch[1] === undefined) break; // prevent infinite loop
+      if (currentMatch[1] === undefined && currentMatch[0] === "") break; // prevent infinite loop
       matches.push({ index: currentMatch.index, text: currentMatch[0] });
       currentMatch = regex.exec(text);
     }
