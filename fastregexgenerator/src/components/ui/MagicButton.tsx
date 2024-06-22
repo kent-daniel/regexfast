@@ -13,7 +13,7 @@ export const MagicButton: React.FC<MagicButtonProps> = ({
 }) => {
   const { pending } = useFormStatus();
 
-  const buttonText = pending ? "🍳 Generating ..." : "🔮 Generate";
+  const buttonText = pending ? "🍳 Generating ... (up to 15s)" : "🔮 Generate";
   return (
     <button
       type="submit"

@@ -40,9 +40,6 @@ const formDataSchema = z.object({
     .transform((val) => val.split(",")),
   shouldNotMatch: z
     .string()
-    .refine((val) => val.trim() !== "", {
-      message: "Should Not Match examples cannot be empty spaces",
-    })
     .optional()
     .transform((val) => (val ? val.split(",") : [])),
   info: z
@@ -76,7 +73,9 @@ export async function submitForm(
       info: validatedData.info,
     });
 
-    return { success: true, result: result };
+    console.log("actions", result);
+
+    return result;
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {

@@ -26,9 +26,11 @@ export const RegexGeneratorForm = () => {
         ref={ref}
         action={async (formData) => {
           const response = await submitForm(formData);
-          if (response.success && response.result) {
+          if (response.result) {
             setResult(response.result);
-          } else {
+            setFormErrors([]);
+          }
+          if (response.errors) {
             setFormErrors(response.errors);
           }
         }}
