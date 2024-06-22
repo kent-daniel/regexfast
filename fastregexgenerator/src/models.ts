@@ -7,7 +7,7 @@ export interface FormDataDTO {
   description: string;
   shouldMatch: string[];
   shouldNotMatch: string[];
-  info: string;
+  info?: string;
 }
 
 export interface RegexResultDTO {
@@ -16,6 +16,12 @@ export interface RegexResultDTO {
   flags: string[];
   success: boolean;
   message?: MessageType;
+}
+
+export interface GeneratorFormResponse {
+  success: boolean;
+  result?: RegexResultDTO;
+  errors?: string[];
 }
 
 export enum MessageType {

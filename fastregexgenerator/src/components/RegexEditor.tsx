@@ -30,6 +30,8 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
   const [delimiter, setDelimiter] = useState<string>(delimiterProp);
   const [language, setLanguage] = useState<string>(languageProp);
   const [matches, setMatches] = useState<Match[]>(matchesProp);
+  const [timeSpent, setTimeSpent] = useState<string>();
+  const [serverStatus, setServerStatus] = useState<string>();
 
   const { result, setResult } = useRegexResult();
 
@@ -57,8 +59,15 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
 
   const fetchMatches = async (pattern: string, text: string, flags: string) => {
     try {
-      const matches = await getRegexMatches(pattern, text, flags, language);
+      const { matches, timeSpent, status } = await getRegexMatches(
+        pattern,
+        text,
+        flags,
+        language
+      );
       setMatches(matches);
+      setTimeSpent(timeSpent);
+      setServerStatus(status);
     } catch (error) {
       console.error("Error while fetching matches:", error);
     }
@@ -89,12 +98,28 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
         value={regexPattern}
         onChange={handleRegexChange}
       />
-      <label
-        htmlFor="text"
-        className="block mb-2 text-md font-medium text-gray-300"
-      >
-        Text Matches:
-      </label>
+      <div className="flex items-center justify-between my-3">
+        <label
+          htmlFor="text"
+          className="block text-md font-medium text-gray-300"
+        >
+          Text Matches:
+        </label>
+        <div
+          className={`text-sm ${
+            serverStatus === "invalid"
+              ? "text-yellow-500"
+              : serverStatus === "success"
+              ? "text-green-500"
+              : serverStatus === "error"
+              ? "text-red-500"
+              : "text-gray-300"
+          }`}
+        >
+          {`${matches.length} matches • ${timeSpent}ms • ${serverStatus}`}
+        </div>
+      </div>
+
       <div className="relative max-w-[650px]">
         <MatchHighlightArea
           onTextChange={handleTextChange}

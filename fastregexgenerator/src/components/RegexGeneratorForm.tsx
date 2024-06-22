@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { MagicButton } from "./ui/MagicButton";
 import { Textarea } from "./ui/textarea";
 import { submitForm } from "@/actions/actions";
@@ -15,6 +15,8 @@ import {
 export const RegexGeneratorForm = () => {
   const ref = useRef<HTMLFormElement>(null);
   const { setResult } = useRegexResult();
+  const [formErrors, setFormErrors] = useState<string[] | undefined>([]);
+
   return (
     <>
       <h1 className="text-2xl font-bold mb-5 border-gray-600 pb-2 border-b tracking-tight">
@@ -23,8 +25,12 @@ export const RegexGeneratorForm = () => {
       <form
         ref={ref}
         action={async (formData) => {
-          const result = await submitForm(formData);
-          setResult(result);
+          const response = await submitForm(formData);
+          if (response.success && response.result) {
+            setResult(response.result);
+          } else {
+            setFormErrors(response.errors);
+          }
         }}
         className="py-3"
       >
@@ -91,6 +97,15 @@ export const RegexGeneratorForm = () => {
               className="text-sm max-h-12 bg-zinc-800 border-none"
             />
           </div>
+          {formErrors && formErrors.length > 0 && (
+            <div className="mb-4 text-xs">
+              <ul className="text-red-600">
+                {formErrors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </TooltipProvider>
 
         <MagicButton />

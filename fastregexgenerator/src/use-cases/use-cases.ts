@@ -1,18 +1,26 @@
+"use server";
 import { FormDataDTO, Match, RegexResultDTO } from "@/models";
 
 export async function getRegexUseCase(
   pattern: string,
   text: string,
   flag: string
-): Promise<Match[]> {
+): Promise<{ status: string; timeSpent: number; matches: Match[] }> {
   try {
     const matches = [];
     const regex = new RegExp(pattern, flag || "");
+
+    const startTime = performance.now();
     const match = regex.exec(text);
 
     // Handle non-global flag case
     if (!flag.includes("g") && match) {
-      return [{ index: match.index, text: match[0] }];
+      const endTime = performance.now();
+      return {
+        status: "success",
+        timeSpent: endTime - startTime,
+        matches: [{ index: match.index, text: match[0] }],
+      };
     }
 
     // Handle global flag case
@@ -23,10 +31,20 @@ export async function getRegexUseCase(
       currentMatch = regex.exec(text);
     }
 
-    return matches;
+    const endTime = performance.now();
+
+    return {
+      status: "success",
+      timeSpent: endTime - startTime,
+      matches,
+    };
   } catch (error) {
     console.error("Error executing regex:", error);
-    return [];
+    return {
+      status: "error",
+      timeSpent: 0,
+      matches: [],
+    };
   }
 }
 
