@@ -69,6 +69,8 @@ export async function generateRegexWithAIUseCase(
       auth: process.env.REPLICATE_API_TOKEN,
     });
 
+    console.log(process.env.REPLICATE_API_TOKEN);
+
     let prompt = createPrompt(formDataDTO);
     let lastResult = null;
     // 2 shot prompting
