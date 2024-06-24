@@ -69,8 +69,6 @@ export async function generateRegexWithAIUseCase(
       auth: process.env.REPLICATE_API_TOKEN,
     });
 
-    console.log(process.env.REPLICATE_API_TOKEN);
-
     let prompt = createPrompt(formDataDTO);
     let lastResult = null;
     // 2 shot prompting
@@ -157,7 +155,12 @@ async function replicateLLMRegexGenerator(
       const outputArray = output as string[];
       parsedOutput = JSON.parse(outputArray.join(""));
     } catch (parseError) {
-      console.error("Error parsing JSON from LLM output:", parseError);
+      console.error(
+        "Error parsing JSON from LLM output:",
+        parseError,
+        process.env.SYSTEM_PROMPT,
+        output
+      );
       throw new Error("Failed to parse JSON output from LLM");
     }
     return {
