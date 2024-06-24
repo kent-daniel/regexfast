@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { Container } from "@/components/Container";
 import Footer from "@/components/Footer";
 import Background from "@/components/Background";
+import { PHProvider } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,14 +34,16 @@ export default function RootLayout({
         type="image/<generated>"
         sizes="<generated>"
       />
-      <body className={inter.className}>
-        <Background />
-        <Container>
-          <Header />
-          {children}
-          <Footer />
-        </Container>
-      </body>
+      <PHProvider>
+        <body className={inter.className}>
+          <Background />
+          <Container>
+            <Header />
+            {children}
+            <Footer />
+          </Container>
+        </body>
+      </PHProvider>
     </html>
   );
 }

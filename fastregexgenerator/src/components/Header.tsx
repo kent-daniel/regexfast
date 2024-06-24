@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import siteLogo from "../../public/siteLogo.jpeg";
+import posthog from "posthog-js";
 
 const navLinks = [
   {
@@ -15,10 +16,12 @@ const navLinks = [
     href: "/quick-regex-snippets",
     label: "Regex snippets",
   },
-  {
-    href: "/suggest",
-    label: `Suggest 💡`,
-  },
+  posthog.isFeatureEnabled("suggest_tab")
+    ? {
+        href: "/suggest",
+        label: `Suggest 💡`,
+      }
+    : null,
 ];
 
 export const Header = () => {
@@ -39,16 +42,18 @@ export const Header = () => {
 
       <nav>
         <ul className="flex gap-x-5 justify-between text-md font-semibold">
-          {navLinks.map((link) => (
-            <li
-              key={link.label}
-              className={`hover:border-b ${
-                pathname === link.href ? "text-gray-200" : "text-zinc-400"
-              }`}
-            >
-              <Link href={link.href}>{link.label}</Link>
-            </li>
-          ))}
+          {navLinks.map((link) =>
+            link ? (
+              <li
+                key={link.label}
+                className={`hover:border-b ${
+                  pathname === link.href ? "text-gray-200" : "text-zinc-400"
+                }`}
+              >
+                <Link href={link.href}>{link.label}</Link>
+              </li>
+            ) : null
+          )}
         </ul>
       </nav>
     </header>
