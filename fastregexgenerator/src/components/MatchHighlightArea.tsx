@@ -84,7 +84,7 @@ export const MatchHighlightArea: React.FC<MatchHighlightAreaProps> = ({
   }, [text, matches, result]);
 
   return (
-    <div className="text-gray-300">
+    <div className="text-gray-300 text-left">
       <div
         ref={contentEditableRef}
         contentEditable="plaintext-only"

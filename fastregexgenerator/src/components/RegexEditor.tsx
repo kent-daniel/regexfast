@@ -74,7 +74,7 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
   };
 
   return (
-    <div className={`px-2 w-full`}>
+    <div className={`px-2 w-full font-mono`}>
       <h2 className="text-gray-300 mb-10  border-gray-600 scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0">
         Regex Editor
       </h2>
@@ -120,7 +120,7 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
         </div>
       </div>
 
-      <div className="relative max-w-[650px]">
+      <div className="relative min-w-[650px]">
         <MatchHighlightArea
           onTextChange={handleTextChange}
           text={inputText}

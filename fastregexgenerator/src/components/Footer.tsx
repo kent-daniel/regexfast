@@ -3,11 +3,11 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className=" text-center text-gray-300 text-lg font-bold mt-auto h-[80px] flex flex-col items-center justify-center">
+    <footer className=" text-center text-gray-100 text-lg font-bold mt-auto h-[80px] flex flex-col items-center justify-center">
       <small>
         by
         <Link
-          className="bg-gradient-to-r from-indigo-900 to-indigo-700 p-1 rounded-md mx-2"
+          className="bg-gradient-to-r from-indigo-600 via-violet-500 to-orange-500 p-1 rounded-md mx-2"
           href={"https://x.com/KentDaniel777"}
         >
           @KentDaniel

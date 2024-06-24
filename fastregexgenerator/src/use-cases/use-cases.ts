@@ -19,7 +19,6 @@ export async function getRegexUseCase(
   matches: Match[];
 }> {
   try {
-    console.log("reom AI", pattern);
     const matches = [];
     const regex = new RegExp(pattern, flag || "");
 
@@ -72,14 +71,13 @@ export async function generateRegexWithAIUseCase(
 
     let prompt = createPrompt(formDataDTO);
     let lastResult = null;
-
-    for (let i = 0; i < 1; i++) {
+    // 2 shot prompting
+    for (let i = 0; i < 2; i++) {
       try {
         const { pattern, flags } = await replicateLLMRegexGenerator(
           replicate,
           prompt
         );
-        console.log("pattern", pattern, flags);
         const { matches, status, timeSpent } = await getRegexUseCase(
           pattern,
           formDataDTO.shouldMatch.join(","),

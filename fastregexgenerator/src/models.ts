@@ -25,7 +25,7 @@ export interface GeneratorFormResponse {
 }
 
 export enum MessageType {
-  AI_FAIL = "AI fails to get optimal regex, more specific description and examples needed",
+  AI_FAIL = "AI might not return optimal regex, more specific description and examples needed",
   SERVER_BUSY = "Server busy",
   TIME_OUT = "Time out",
 }

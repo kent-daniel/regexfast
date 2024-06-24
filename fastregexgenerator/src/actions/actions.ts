@@ -73,8 +73,6 @@ export async function submitForm(
       info: validatedData.info,
     });
 
-    console.log("actions", result);
-
     return result;
   } catch (error) {
     if (error instanceof z.ZodError) {

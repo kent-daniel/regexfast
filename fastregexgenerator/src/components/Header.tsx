@@ -12,11 +12,11 @@ const navLinks = [
     label: "Generator",
   },
   {
-    href: "/cheatsheets",
-    label: "Regex cheatsheets",
+    href: "/quick-regex-snippets",
+    label: "Regex snippets",
   },
   {
-    href: "/create-post",
+    href: "/suggest",
     label: `Suggest 💡`,
   },
 ];

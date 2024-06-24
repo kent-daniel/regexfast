@@ -15,19 +15,19 @@ const faqs = [
   {
     id: 2,
     question: "How does it work?",
-    answer: `You input your prompt, which is then sent to the LLM (Replicate llama3). The server tests the generated pattern. If there are errors, the AI receives feedback and regenerates the pattern multiple times until it is optimal. The final result is then sent back to the you for further editing.`,
+    answer: `You input your prompt, which is then sent to the LLM (Meta's llama3). The server tests the generated pattern. If there are syntax errors, the AI receives feedback and regenerates the pattern multiple times until it is optimal. The final result is then sent back to the you for further editing.`,
   },
   {
     id: 3,
     question: "Is my data collected?",
-    answer: `Nope, your data is not stored on the server or in any database. Your prompt is sent to Replicate for processing, but that is the extent of the data handling.`,
+    answer: `Nope, your data is not stored on the server or in any database. Your prompt is sent to Replicate API for processing, but that is the extent of the data handling.`,
   },
 ];
 
 export default function FAQSection() {
   return (
     <div className="w-full py-6 px-4 text-center text-gray-300">
-      <h1 className="text-3xl font-bold mb-8">Frequently Asked Questions</h1>
+      <h1 className="text-3xl font-bold mb-8">FAQ</h1>
       <div className="mx-auto w-full my-4 max-w-2xl divide-y divide-white/5 rounded-xl bg-indigo-500/15">
         {faqs.map((faq) => (
           <Disclosure

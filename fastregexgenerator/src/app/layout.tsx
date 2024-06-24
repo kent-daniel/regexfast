@@ -5,16 +5,18 @@ import { Header } from "@/components/Header";
 import { Container } from "@/components/Container";
 import Footer from "@/components/Footer";
 import Background from "@/components/Background";
-import Link from "next/link";
-import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Magic Regex Generator",
-  description: "Generate and test regex with ai",
-  icons: {
-    icon: "/fastregexgenerator/public/I_want_a_magix_box_with_coding copy.ico",
+  title: {
+    default: "Magic Regex Generator",
+    template: "%s - Magic regex Generator",
+  },
+  description:
+    "Generate and test regular expressions effortlessly with our AI-powered Regex Generator. This tool offers AI regex generation for email validation, text parsing, and more. Create regex patterns based on your example data, convert text to regular expressions, and generate regex for JavaScript with ease.",
+  twitter: {
+    card: "summary_large_image",
   },
 };
 

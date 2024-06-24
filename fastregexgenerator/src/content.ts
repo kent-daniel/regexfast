@@ -1,0 +1,86 @@
+export const content = [
+  {
+    id: "a1b2c3",
+    title: "Common Email Pattern",
+    description: "Matches most email addresses.",
+    value: "\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}\b",
+    flags: "gi",
+    inputTextProp: "test@example.com",
+  },
+  {
+    id: "d4e5f6",
+    title: "HTML Tags",
+    description: "Matches HTML tags and its attributes.",
+    value: "<\\/?[\\w\\s]*>|<.+[\\W]>",
+    flags: "g",
+    inputTextProp: "<div>Sample HTML</div>",
+  },
+  {
+    id: "g7h8i9",
+    title: "Dates dd-MM-YYYY",
+    description: "Matches dates in dd-MM-YYYY format.",
+    value: "\\b(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-[12][0-9]{3}\\b",
+    flags: "g",
+    inputTextProp: "15-06-2023",
+  },
+  {
+    id: "j1k2l3",
+    title: "Bitcoin Address",
+    description: "Matches Bitcoin addresses.",
+    value: "\\b[13][a-km-zA-HJ-NP-Z1-9]{26,33}\\b",
+    flags: "g",
+    inputTextProp: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  },
+  {
+    id: "m4n5o6",
+    title: "IPv4 Address",
+    description: "Matches IPv4 addresses.",
+    value:
+      "\\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b",
+    flags: "g",
+    inputTextProp: "192.168.1.1",
+  },
+  {
+    id: "p7q8r9",
+    title: "Hex Color Code",
+    description: "Matches hex color codes.",
+    value: "#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})",
+    flags: "g",
+    inputTextProp: "#a3c113",
+  },
+  {
+    id: "s1t2u3",
+    title: "URL",
+    description: "Matches URLs.",
+    value:
+      "\\bhttps?:\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)",
+    flags: "gi",
+    inputTextProp: "https://www.example.com",
+  },
+  {
+    id: "v4w5x6",
+    title: "Phone Number",
+    description: "Matches phone numbers in various formats.",
+    value: "\\b\\+?\\d[\\d -.]{7,}\\b",
+    flags: "g",
+    inputTextProp: "+123-456-7890",
+  },
+  {
+    id: "y1z2a3",
+    title: "Username",
+    description: "Matches usernames (alphanumeric and underscores).",
+    value: "\\b[a-zA-Z0-9_]{3,16}\\b",
+    flags: "gi",
+    inputTextProp: "user_name123",
+  },
+  {
+    id: "b4c5d6",
+    title:
+      "Password (8-20 chars, at least 1 uppercase, 1 lowercase, 1 number, 1 special char)",
+    description: "Matches strong passwords.",
+    value:
+      "(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}",
+    flags: "gi",
+    inputTextProp: "Password123!",
+  },
+];
