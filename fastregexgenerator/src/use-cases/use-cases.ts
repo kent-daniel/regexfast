@@ -152,8 +152,14 @@ async function replicateLLMRegexGenerator(
     const output = await replicate.run("meta/meta-llama-3-70b-instruct", {
       input,
     });
-    const outputArray = output as string[];
-    const parsedOutput = JSON.parse(outputArray.join(""));
+    let parsedOutput;
+    try {
+      const outputArray = output as string[];
+      parsedOutput = JSON.parse(outputArray.join(""));
+    } catch (parseError) {
+      console.error("Error parsing JSON from LLM output:", parseError);
+      throw new Error("Failed to parse JSON output from LLM");
+    }
     return {
       pattern: parsedOutput.pattern,
       flags: parsedOutput.flags || "g",
