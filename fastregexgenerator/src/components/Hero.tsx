@@ -14,7 +14,8 @@ const Hero = () => {
         in the editor to test and refine
       </p>
       <p className="text-md md:text-md mb-8 font-semibold text-center max-w-xl text-neutral-400">
-        Regex sucks. Simplify it with AI, so you can focus on meaningful work.
+        Regex can sometimes be difficult. Simplify it with AI, so you can focus
+        on meaningful work.
       </p>
       <a
         href="https://www.producthunt.com/posts/magic-regex-generator?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-magic&#0045;regex&#0045;generator"
