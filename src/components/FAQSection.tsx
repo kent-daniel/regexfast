@@ -14,8 +14,8 @@ const faqs = [
   },
   {
     id: 2,
-    question: "How does it work?",
-    answer: `You input your prompt, which is then sent to the LLM (Meta's llama3). The server tests the generated pattern. If there are syntax errors, the AI receives feedback and regenerates the pattern multiple times until it is optimal. The final result is then sent back to the you for further editing.`,
+    question: "How does the AI coding agent work?",
+    answer: `Our advanced AI-powered regex generator uses an intelligent three-phase approach: (1) Generation - The AI analyzes your natural language description and generates optimized regex patterns. (2) Execution - Each pattern is automatically tested in a secure, isolated sandbox environment using Python and TypeScript to verify syntax correctness and match accuracy. (3) Evaluation - The system evaluates test results in an iterative loop, providing feedback to the AI until the pattern achieves optimal performance. This automated generate-execute-evaluate cycle ensures you receive the most accurate, production-ready regular expression patterns without manual testing or debugging.`,
   },
   {
     id: 3,
