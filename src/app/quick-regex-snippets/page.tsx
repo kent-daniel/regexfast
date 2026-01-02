@@ -6,6 +6,7 @@ import React from "react";
 
 export const metadata: Metadata = {
   title: "Quick Snippets",
+  description: "Try out quick regex snippets for common patterns. such as email validation, URL matching, and more.",
 };
 
 export default function Page() {
