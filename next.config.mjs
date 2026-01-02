@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // For static export to Cloudflare Pages
+  // Removed output: 'export' to support Server Actions on Cloudflare Pages
+  // Dynamic routes and Server Actions require Edge Runtime
 };
 
 export default nextConfig;
