@@ -7,6 +7,9 @@ import {
   RegexResultDTO,
 } from "@/models";
 import Replicate from "replicate";
+import { requireCloudflareEnv } from "@/lib/cloudflare-env";
+
+export const runtime = 'edge';
 
 export async function getRegexUseCase(
   pattern: string,
@@ -65,8 +68,11 @@ export async function generateRegexWithAIUseCase(
   formDataDTO: FormDataDTO
 ): Promise<GeneratorFormResponse> {
   try {
+    // Get API token from Cloudflare Pages environment or process.env
+    const apiToken = await requireCloudflareEnv("REPLICATE_API_TOKEN");
+    
     const replicate = new Replicate({
-      auth: process.env.REPLICATE_API_TOKEN,
+      auth: apiToken,
     });
 
     let prompt = createPrompt(formDataDTO);
@@ -140,10 +146,13 @@ async function replicateLLMRegexGenerator(
   prompt: string
 ): Promise<{ pattern: string; flags: string }> {
   try {
+    // Get system prompt from Cloudflare Pages environment or process.env
+    const systemPrompt = await requireCloudflareEnv("SYSTEM_PROMPT");
+    
     const input = {
       prompt,
       max_new_tokens: 512,
-      system_prompt: process.env.SYSTEM_PROMPT,
+      system_prompt: systemPrompt,
       prompt_template: "system\n\n{system_prompt}user\n\n{prompt}assistant\n\n",
     };
 
@@ -158,7 +167,7 @@ async function replicateLLMRegexGenerator(
       console.error(
         "Error parsing JSON from LLM output:",
         parseError,
-        process.env.SYSTEM_PROMPT,
+        systemPrompt,
         output
       );
       throw new Error("Failed to parse JSON output from LLM");

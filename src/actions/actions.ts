@@ -6,6 +6,8 @@ import {
   getRegexUseCase,
 } from "@/use-cases/use-cases";
 
+export const runtime = 'edge';
+
 export async function getRegexMatches(
   pattern: string,
   text: string,
