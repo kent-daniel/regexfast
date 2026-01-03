@@ -3,17 +3,16 @@ import { ArrowDownIcon } from "./icons/Icons";
 
 const Hero = () => {
   return (
-    <div className="flex flex-col items-center justify-center  py-20 px-6 text-center">
-      <h1 className="mb-8 relative z-10 text-3xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-b from-gray-100 to-slate-400 text-center font-sans font-bold text-shadow-glow">
-        Generate, Test, and Edit Regular Expression patterns effortlessly with
-        AI Agent
+    <div className="flex flex-col items-center justify-center py-24 md:py-32 px-6 text-center">
+      <h1 className="mb-6 relative z-10 text-4xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-white via-gray-100 to-slate-400 text-center font-sans font-bold tracking-tight leading-tight">
+        Generate and Test Regex with AI Agent
       </h1>
 
-      <p className="text-lg md:text-xl mb-4 font-semibold text-center max-w-2xl text-neutral-300">
-        AI coding agent that generates, executes, and evaluates regular expressions to deliver the most accurate regex patterns for your needs
+      <p className="text-xl md:text-2xl mb-3 font-medium text-center max-w-3xl text-neutral-200 leading-relaxed">
+        AI coding agent that generates, executes, and evaluates to deliver accurate regex patterns
       </p>
-      <p className="text-md md:text-md mb-8 font-semibold text-center max-w-xl text-neutral-400">
-        Our intelligent system automatically tests and validates patterns in a secure sandbox environment, ensuring production-ready results every time
+      <p className="text-base md:text-lg mb-10 font-normal text-center max-w-2xl text-neutral-400 leading-relaxed">
+        Automatically tested in a secure sandbox for reliable results
       </p>
       <a
         href="https://www.producthunt.com/posts/magic-regex-generator?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-magic&#0045;regex&#0045;generator"
