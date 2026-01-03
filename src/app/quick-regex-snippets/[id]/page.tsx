@@ -7,12 +7,13 @@ import { notFound } from "next/navigation";
 
 export const runtime = 'edge';
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
-}): Metadata {
-  const item = content.find((item) => item.id === params.id);
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const item = content.find((item) => item.id === id);
 
   return {
     title: item?.title,
@@ -20,9 +21,9 @@ export function generateMetadata({
   };
 }
 
-export default function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   // Extract id from params
-  const { id } = params;
+  const { id } = await params;
 
   // Find the item in content array based on id
   const item = content.find((item) => item.id === id);
