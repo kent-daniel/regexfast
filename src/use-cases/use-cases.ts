@@ -9,7 +9,6 @@ import {
 import Replicate from "replicate";
 import { requireCloudflareEnv } from "@/lib/cloudflare-env";
 
-export const runtime = 'edge';
 
 export async function getRegexUseCase(
   pattern: string,
