@@ -401,7 +401,8 @@ export default {
     }
     return (
       // Route the request to our agent or return 404 if not found
-      (await routeAgentRequest(request, env)) ||
+      // Enable CORS for cross-origin WebSocket connections (Pages → Worker)
+      (await routeAgentRequest(request, env, { cors: true })) ||
       new Response("Not found", { status: 404 })
     );
   }
