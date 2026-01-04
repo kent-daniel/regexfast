@@ -8,7 +8,7 @@ import type { UIMessage } from "@ai-sdk/react";
 import {
   SUBAGENT_STATUS_DATA_PART_TYPE,
   type SubagentStatusEvent
-} from "@/agent-logic/shared";
+} from "@/agent-worker/shared";
 import type { MessageRowModel } from "@/components/chat/message-row";
 
 type ChatState = {

@@ -1,8 +1,8 @@
 import type { ToolUIPart, ChatAddToolApproveResponseFunction } from "ai";
 import { WrenchIcon, CheckCircleIcon, CircleNotchIcon, WarningCircleIcon, CodeIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { APPROVAL } from "@/agent-logic/shared";
-import type { SubagentPhase } from "@/agent-logic/shared";
+import { APPROVAL } from "@/agent-worker/shared";
+import type { SubagentPhase } from "@/agent-worker/shared";
 
 interface ToolInvocationCardProps {
   toolUIPart: ToolUIPart;

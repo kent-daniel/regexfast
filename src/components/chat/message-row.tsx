@@ -4,7 +4,7 @@ import type { ToolUIPart } from "ai";
 
 import { MemoizedMarkdown } from "@/components/chat/memoized-markdown";
 import { ToolInvocationCard } from "@/components/chat/tool-invocation-card";
-import type { SubagentStatusEvent } from "@/agent-logic/shared";
+import type { SubagentStatusEvent } from "@/agent-worker/shared";
 
 import { SparkleIcon, UserIcon } from "@phosphor-icons/react";
 

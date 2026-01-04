@@ -3,7 +3,7 @@
 import { useRef, useEffect, useCallback } from "react";
 import type { ChatAddToolApproveResponseFunction } from "ai";
 import { MessageRow, type MessageRowModel } from "@/components/chat/message-row";
-import type { SubagentStatusEvent } from "@/agent-logic/shared";
+import type { SubagentStatusEvent } from "@/agent-worker/shared";
 import { EmptyState } from "./empty-state";
 
 type MessageListProps = {
