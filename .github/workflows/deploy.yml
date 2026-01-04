@@ -1,0 +1,109 @@
+name: Deploy to Cloudflare
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+env:
+  WORKER_NAME: agent-worker-do
+  PAGES_PROJECT: regexfast
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy ${{ github.ref == 'refs/heads/main' && 'Production' || 'Preview' }}
+    environment: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Preview' }}
+    permissions:
+      contents: read
+      deployments: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Build for Cloudflare Pages
+        run: npm run build:pages
+
+      - name: Deploy Worker
+        id: deploy-worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --minify ${{ github.ref != 'refs/heads/main' && '--env preview' || '' }}
+
+      - name: Deploy Pages
+        id: deploy-pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy .vercel/output/static --project-name=${{ env.PAGES_PROJECT }} --branch=${{ github.ref == 'refs/heads/main' && 'main' || github.head_ref || github.ref_name }}
+
+      - name: Comment PR with Preview URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const workerUrl = '${{ steps.deploy-worker.outputs.deployment-url }}' || 'https://agent-worker-do-preview.workers.dev';
+            const pagesUrl = '${{ steps.deploy-pages.outputs.deployment-url }}' || 'https://${{ github.head_ref }}.${{ env.PAGES_PROJECT }}.pages.dev';
+            
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Preview deployment ready')
+            );
+            
+            const body = [
+              '🚀 **Preview deployment ready!**',
+              '',
+              '| Resource | URL |',
+              '|----------|-----|',
+              `| 🌐 Pages | ${pagesUrl} |`,
+              `| 🔧 Worker | ${workerUrl} |`,
+              '',
+              `📝 **Branch:** \`${{ github.head_ref }}\``,
+              `🔄 **Commit:** \`${{ github.sha }}\``,
+              '',
+              'This preview will be automatically updated when you push new commits.'
+            ].join('\n');
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body
+              });
+            }

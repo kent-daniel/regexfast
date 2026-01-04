@@ -5,7 +5,11 @@ export const runtime = "edge";
 
 export async function POST(request: Request): Promise<Response> {
   try {
-    const { pattern, text, flag } = await request.json();
+    const { pattern, text, flag } = (await request.json()) as {
+      pattern: string;
+      text: string;
+      flag: string;
+    };
 
     if (!text || text.length === 0 || !pattern || pattern.length === 0) {
       return Response.json({ status: "invalid", timeSpent: "0", matches: [] });
