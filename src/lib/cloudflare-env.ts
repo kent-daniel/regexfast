@@ -1,24 +1,14 @@
+import { getRequestContext } from "@cloudflare/next-on-pages";
 
-type CloudflareEnv = {
-  REPLICATE_API_TOKEN?: string;
-  SYSTEM_PROMPT?: string;
-  NEXT_PUBLIC_POSTHOG_KEY?: string;
-  NEXT_PUBLIC_POSTHOG_HOST?: string;
-  [key: string]: string | undefined;
-};
+export const runtime = "edge";
 
-
-export async function getCloudflareEnv(
-  key: string,
+export async function getCloudflareEnv<K extends keyof CloudflareEnv>(
+  key: K,
   fallback?: string
 ): Promise<string | undefined> {
   try {
-    // Try to import Cloudflare Next.js adapter
-    const { getRequestContext } = await import("@cloudflare/next-on-pages");
-    
     // Get the platform environment from Cloudflare context
-    const context = getRequestContext();
-    const env = context?.env as CloudflareEnv;
+    const { env } = getRequestContext();
     
     if (env && env[key]) {
       return env[key];
@@ -35,10 +25,10 @@ export async function getCloudflareEnv(
 }
 
 
-export async function getCloudflareEnvs(
-  keys: string[]
-): Promise<Record<string, string | undefined>> {
-  const result: Record<string, string | undefined> = {};
+export async function getCloudflareEnvs<K extends keyof CloudflareEnv>(
+  keys: K[]
+): Promise<Record<K, string | undefined>> {
+  const result = {} as Record<K, string | undefined>;
   
   for (const key of keys) {
     result[key] = await getCloudflareEnv(key);
@@ -48,7 +38,9 @@ export async function getCloudflareEnvs(
 }
 
 
-export async function requireCloudflareEnv(key: string): Promise<string> {
+export async function requireCloudflareEnv<K extends keyof CloudflareEnv>(
+  key: K
+): Promise<string> {
   const value = await getCloudflareEnv(key);
   
   if (!value) {
@@ -64,7 +56,6 @@ export async function requireCloudflareEnv(key: string): Promise<string> {
 
 export async function isCloudflarePages(): Promise<boolean> {
   try {
-    const { getRequestContext } = await import("@cloudflare/next-on-pages");
     const context = getRequestContext();
     return !!context?.env;
   } catch {
