@@ -2,9 +2,9 @@ import { isStaticToolUIPart, type ChatAddToolApproveResponseFunction } from "ai"
 import type { UIMessage } from "@ai-sdk/react";
 import type { ToolUIPart } from "ai";
 
-import { MemoizedMarkdown } from "@/components/memoized-markdown";
-import { ToolInvocationCard } from "@/components/tool-invocation-card/ToolInvocationCard";
-import type { SubagentStatusEvent } from "@/shared";
+import { MemoizedMarkdown } from "@/components/chat/memoized-markdown";
+import { ToolInvocationCard } from "@/components/chat/tool-invocation-card";
+import type { SubagentStatusEvent } from "@/agent-logic/shared";
 
 import { SparkleIcon, UserIcon } from "@phosphor-icons/react";
 

@@ -1,8 +1,8 @@
 import type { ToolUIPart, ChatAddToolApproveResponseFunction } from "ai";
 import { WrenchIcon, CheckCircleIcon, CircleNotchIcon, WarningCircleIcon, CodeIcon } from "@phosphor-icons/react";
-import { Button } from "@/components/button/Button";
-import { APPROVAL } from "@/shared";
-import type { SubagentPhase } from "@/shared";
+import { Button } from "@/components/ui/button";
+import { APPROVAL } from "@/agent-logic/shared";
+import type { SubagentPhase } from "@/agent-logic/shared";
 
 interface ToolInvocationCardProps {
   toolUIPart: ToolUIPart;
@@ -180,7 +180,7 @@ export function ToolInvocationCard({
               Deny
             </Button>
             <Button
-              variant="primary"
+              variant="default"
               size="sm"
               onClick={() => handleApproval(true)}
             >
@@ -201,7 +201,7 @@ export function ToolInvocationCard({
             Deny
           </Button>
           <Button
-            variant="primary"
+            variant="default"
             size="sm"
             onClick={() => onSubmit({ toolCallId, result: APPROVAL.YES })}
           >

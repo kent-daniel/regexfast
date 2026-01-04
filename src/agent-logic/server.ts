@@ -15,6 +15,11 @@ import { createExecutions, createTools } from "./tools";
 import { SUBAGENT_STATUS_DATA_PART_TYPE } from "./shared";
 // import { env } from "cloudflare:workers";
 
+type Env = {
+  AI_GATEWAY_API_KEY: string;
+  [key: string]: unknown;
+};
+
 type TokenUsageTotals = {
   totalTokens: number;
   promptTokens: number;

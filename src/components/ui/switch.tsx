@@ -1,12 +1,14 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 
-type ToggleProps = {
+type SwitchProps = {
   onClick: () => void;
   size?: "sm" | "base" | "lg";
   toggled: boolean;
 };
 
-export const Toggle = ({ onClick, size = "base", toggled }: ToggleProps) => {
+export const Switch = ({ onClick, size = "base", toggled }: SwitchProps) => {
   return (
     <button
       type="button"

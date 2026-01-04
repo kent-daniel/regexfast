@@ -65,7 +65,11 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
         },
         body: JSON.stringify({ pattern, text, flag: flags }),
       });
-      const { matches, timeSpent, status } = await res.json();
+      const { matches, timeSpent, status } = (await res.json()) as {
+        matches: Match[];
+        timeSpent: string;
+        status: string;
+      };
       setMatches(matches);
       setTimeSpent(timeSpent);
       setServerStatus(status);

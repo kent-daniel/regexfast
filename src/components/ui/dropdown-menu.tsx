@@ -1,3 +1,5 @@
+"use client";
+
 /** biome-ignore-all lint/a11y/noStaticElementInteractions: todo */
 import { DotsThreeIcon, IconContext } from "@phosphor-icons/react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
@@ -85,9 +87,7 @@ const DropdownMenu = ({
           : buttonVariants(
               buttonProps ?? {
                 variant: "ghost",
-                size: "default", // 'base',
-                // shape: 'square',
-                // interaction: 'none',
+                size: "default",
                 class:
                   "radix-state-open:text-neutral-950 dark:radix-state-open:text-white focus-visible:opacity-100"
               }

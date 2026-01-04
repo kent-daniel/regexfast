@@ -1,10 +1,11 @@
-import { Button } from "@/components/button/Button";
-import { Card } from "@/components/card/Card";
-import useClickOutside from "@/hooks/useClickOutside";
-import { XIcon } from "@phosphor-icons/react";
+"use client";
 
-import { useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import useClickOutside from "@/hooks/useClickOutside";
 import { cn } from "@/lib/utils";
+import { XIcon } from "@phosphor-icons/react";
+import { useEffect, useRef } from "react";
 
 type ModalProps = {
   className?: string;
@@ -21,11 +22,16 @@ export const Modal = ({
   isOpen,
   onClose
 }: ModalProps) => {
-  const modalRef = clickOutsideToClose
-    ? // biome-ignore lint/correctness/useHookAtTopLevel: todo
-      useClickOutside(onClose)
-    : // biome-ignore lint/correctness/useHookAtTopLevel: todo
-      useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const clickOutsideRef = useClickOutside(onClose);
+
+  useEffect(() => {
+    if (!isOpen || !clickOutsideToClose) return;
+    if (!modalRef.current || !clickOutsideRef.current) return;
+
+    // Attach the click-outside handler to this modal instance.
+    clickOutsideRef.current = modalRef.current;
+  }, [clickOutsideToClose, clickOutsideRef, isOpen]);
 
   // Stop site overflow when modal is open
   useEffect(() => {
@@ -78,7 +84,7 @@ export const Modal = ({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, onClose, modalRef.current]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -87,7 +93,7 @@ export const Modal = ({
       <div className="fade fixed top-0 left-0 h-full w-full bg-black/5 backdrop-blur-[2px]" />
 
       <Card
-        className={cn("reveal reveal-sm relative z-50 max-w-md", className)}
+        className={cn("reveal reveal-sm relative z-50 max-w-md p-4", className)}
         ref={modalRef}
         tabIndex={-1}
       >
@@ -95,7 +101,7 @@ export const Modal = ({
 
         <Button
           aria-label="Close Modal"
-          shape="square"
+          size="icon"
           className="absolute top-2 right-2"
           onClick={onClose}
           variant="ghost"

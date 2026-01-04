@@ -1,4 +1,10 @@
-import { Tooltip } from "@/components/tooltip/Tooltip";
+"use client";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 import { useMenuNavigation } from "@/hooks/useMenuNavigation";
 import { cn } from "@/lib/utils";
 import { IconContext } from "@phosphor-icons/react";
@@ -19,24 +25,23 @@ const MenuOption = ({
   onClick,
   tooltip
 }: MenuOptionProps) => (
-  <Tooltip
-    content={tooltip}
-    id={id}
-    className="first-of-type:*:first:rounded-l-lg last-of-type:*:first:rounded-r-lg"
-  >
-    <button
-      type="button"
-      className={cn(
-        "text-ob-base-100 hover:text-ob-base-300 border-ob-border focus:inset-ring-focus focus-visible:border-ob-focus relative -ml-px flex h-full w-11 cursor-pointer items-center justify-center border transition-colors focus:z-10 focus:outline-none focus-visible:z-10 focus-visible:inset-ring-[0.5]",
-        {
-          "text-ob-base-300 bg-ob-base-200 focus-visible:border-ob-focus":
-            isActive === id
-        }
-      )}
-      onClick={onClick}
-    >
-      <IconContext.Provider value={{ size: 18 }}>{icon}</IconContext.Provider>
-    </button>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <button
+        type="button"
+        className={cn(
+          "text-ob-base-100 hover:text-ob-base-300 border-ob-border focus:inset-ring-focus focus-visible:border-ob-focus relative -ml-px flex h-full w-11 cursor-pointer items-center justify-center border transition-colors focus:z-10 focus:outline-none focus-visible:z-10 focus-visible:inset-ring-[0.5] first:rounded-l-lg last:rounded-r-lg",
+          {
+            "text-ob-base-300 bg-ob-base-200 focus-visible:border-ob-focus":
+              isActive === id
+          }
+        )}
+        onClick={onClick}
+      >
+        <IconContext.Provider value={{ size: 18 }}>{icon}</IconContext.Provider>
+      </button>
+    </TooltipTrigger>
+    <TooltipContent>{tooltip}</TooltipContent>
   </Tooltip>
 );
 

@@ -1,5 +1,9 @@
-import { Slot } from "@/components/slot/Slot";
-import { Tooltip } from "@/components/tooltip/Tooltip";
+import { Slot } from "@/components/ui/slot";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export type AvatarProps = {
@@ -65,8 +69,13 @@ const AvatarComponent = ({
 
 export const Avatar = ({ ...props }: AvatarProps) => {
   return props.tooltip ? (
-    <Tooltip content={props.tooltip} className={props.className} id={props.id}>
-      <AvatarComponent {...props} className={undefined} />
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className={props.className}>
+          <AvatarComponent {...props} className={undefined} />
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>{props.tooltip}</TooltipContent>
     </Tooltip>
   ) : (
     <AvatarComponent {...props} />
