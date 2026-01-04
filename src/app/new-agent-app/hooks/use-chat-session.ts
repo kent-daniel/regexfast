@@ -36,6 +36,11 @@ export function useChatSession() {
 
   const [agentState, setAgentState] = useState<ChatState | null>(null);
 
+  // Debug: log the worker URL to verify env var is set
+  if (typeof window !== "undefined") {
+    console.log("[useAgent] NEXT_PUBLIC_WORKER_URL:", process.env.NEXT_PUBLIC_WORKER_URL);
+  }
+
   const agent = useAgent({
     agent: "chat",
     name: sessionId || "default",
