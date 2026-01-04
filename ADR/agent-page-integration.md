@@ -167,23 +167,23 @@ Slices:
 ## Work breakdown (simple checklist)
 
 ### UI wiring
-- [ ] Create Next page component for `/new-agent-app` that renders the chat UI.
-- [ ] Add a Next-only wrapper that provides `Providers` for the chat UI.
-- [ ] Resolve `@/*` import collisions by introducing a dedicated alias (`@agent-ui/*`).
-- [ ] Fix missing stylesheet import for agent UI.
-- [ ] Decide whether agent page uses global header/footer or a dedicated layout.
+- [x] Create Next page component for `/new-agent-app` that renders the chat UI.
+- [x] Add a Next-only wrapper that provides `Providers` for the chat UI.
+- [x] Resolve `@/*` import collisions by introducing a dedicated alias (`@agent-ui/*`). *(Not needed - imports already work correctly)*
+- [x] Fix missing stylesheet import for agent UI. *(Not needed - uses globals.css)*
+- [x] Decide whether agent page uses global header/footer or a dedicated layout. *(Uses dedicated layout without header/footer)*
 - [ ] Plan convergence: gradually replace `src/agent-pages/components/*` primitives with `src/components/ui/*` where feasible.
 
 ### Backend wiring
-- [ ] Add Worker deployment config (`wrangler.toml`) and environment variable setup.
-- [ ] Add local dev story (`wrangler dev`, env vars, endpoints).
-- [ ] Confirm streaming + persistent connection requirements.
-- [ ] Resolve `SANDBOX_API_KEY` access pattern for the runtime you deploy to.
+- [x] Add Worker deployment config (`wrangler.jsonc`) and environment variable setup.
+- [x] Add local dev story (`wrangler dev`, env vars, endpoints). See [docs/agent-backend-local-dev.md](../docs/agent-backend-local-dev.md)
+- [x] Confirm streaming + persistent connection requirements. *(Uses agents library WebSocket connections)*
+- [x] Resolve `SANDBOX_API_KEY` access pattern for the runtime you deploy to. *(Uses process.env with nodejs_compat flag)*
 
 ### Edge proxy / routing
-- [ ] Decide the proxy path prefix (e.g. `/agents/*` or what the client actually calls).
+- [x] Decide the proxy path prefix (e.g. `/agents/*` or what the client actually calls). *(`/agents/*` and `/check-open-ai-key`)*
 - [ ] In production on Pages: configure Cloudflare **Worker Routes** for that prefix on the Pages hostname to send traffic to the agent Worker.
-- [ ] For local dev only (optional): use Next rewrites if you are not exercising WebSockets.
+- [x] For local dev only (optional): use Next rewrites if you are not exercising WebSockets. *(Configured in next.config.mjs)*
 - [ ] Confirm production routing on Cloudflare Pages works as intended (including WebSocket upgrades if used).
 
 ## Consequences

@@ -15,10 +15,8 @@ import { createExecutions, createTools } from "./tools";
 import { SUBAGENT_STATUS_DATA_PART_TYPE } from "./shared";
 // import { env } from "cloudflare:workers";
 
-type Env = {
-  AI_GATEWAY_API_KEY: string;
-  [key: string]: unknown;
-};
+// Use the global Cloudflare.Env from env.d.ts
+// The wrangler types generator adds AI_GATEWAY_API_KEY, Chat DO binding, etc.
 
 type TokenUsageTotals = {
   totalTokens: number;
