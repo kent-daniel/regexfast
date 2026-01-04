@@ -8,10 +8,60 @@ on:
     branches:
       - main
 
+env:
+  WORKER_NAME: agent-worker-do
+  PAGES_PROJECT: regexfast
+
 jobs:
-  deploy:
+  # ========== PRODUCTION DEPLOYMENT (main branch) ==========
+  deploy-production:
     runs-on: ubuntu-latest
-    name: Deploy
+    name: Deploy Production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: Production
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Deploy Worker (Production)
+        id: deploy-worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --minify
+
+      - name: Deploy Pages (Production)
+        id: deploy-pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy .next --project-name=${{ env.PAGES_PROJECT }} --branch=main
+
+  # ========== PREVIEW DEPLOYMENT (non-main branches) ==========
+  deploy-preview:
+    runs-on: ubuntu-latest
+    name: Deploy Preview
+    if: github.ref != 'refs/heads/main'
+    environment: Preview
     permissions:
       contents: read
       deployments: write
@@ -29,28 +79,26 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build Next.js
         run: npm run build
         env:
           NODE_ENV: production
 
-      - name: Deploy to Cloudflare Workers (Production)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Deploy Worker (Preview)
+        id: deploy-worker
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --minify
+          command: deploy --minify --env preview
 
-      - name: Deploy to Cloudflare Workers (Preview)
-        if: github.ref != 'refs/heads/main'
+      - name: Deploy Pages (Preview)
+        id: deploy-pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --minify
-        env:
-          WRANGLER_ENVIRONMENT: preview
+          command: pages deploy .next --project-name=${{ env.PAGES_PROJECT }} --branch=${{ github.head_ref || github.ref_name }}
 
       - name: Comment PR with Preview URL
         if: github.event_name == 'pull_request'
@@ -58,11 +106,46 @@ jobs:
         with:
           script: |
             const prNumber = context.issue.number;
-            const previewUrl = `https://preview.cloudflare-agent.workers.dev`;
+            const workerUrl = '${{ steps.deploy-worker.outputs.deployment-url }}' || 'https://preview.agent-worker-do.workers.dev';
+            const pagesUrl = '${{ steps.deploy-pages.outputs.deployment-url }}' || 'https://${{ github.head_ref }}.${{ env.PAGES_PROJECT }}.pages.dev';
             
-            github.rest.issues.createComment({
-              issue_number: prNumber,
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🚀 Preview deployment ready!\n\n📦 Preview URL: ${previewUrl}\n\nThis preview will be automatically updated when you push new commits.`
+              issue_number: prNumber
             });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Preview deployment ready')
+            );
+            
+            const body = [
+              '🚀 **Preview deployment ready!**',
+              '',
+              '| Resource | URL |',
+              '|----------|-----|',
+              `| 🌐 Pages | ${pagesUrl} |`,
+              `| 🔧 Worker | ${workerUrl} |`,
+              '',
+              `📝 **Branch:** \`${{ github.head_ref }}\``,
+              `🔄 **Commit:** \`${{ github.sha }}\``,
+              '',
+              'This preview will be automatically updated when you push new commits.'
+            ].join('\n');
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body
+              });
+            }

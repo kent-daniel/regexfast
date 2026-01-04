@@ -35,6 +35,27 @@
 	],
 	"observability": {
 		"enabled": true
+	},
+	/**
+	 * Preview Environment
+	 * Used for PR preview deployments
+	 */
+	"env": {
+		"preview": {
+			"name": "agent-worker-do-preview",
+			"ai": {
+				"binding": "AI",
+				"remote": true
+			},
+			"durable_objects": {
+				"bindings": [
+					{
+						"name": "Chat",
+						"class_name": "Chat"
+					}
+				]
+			}
+		}
 	}
 	/**
 	 * Smart Placement
