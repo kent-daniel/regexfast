@@ -1,18 +1,17 @@
 "use client";
 import { cn } from "@/lib/utils";
 import React from "react";
-import { useFormStatus } from "react-dom";
 
 interface MagicButtonProps {
   className?: string;
+  pending?: boolean;
 }
 
 export const MagicButton: React.FC<MagicButtonProps> = ({
   className,
+  pending = false,
   ...props
 }) => {
-  const { pending } = useFormStatus();
-
   const buttonText = pending ? "🍳 Generating ... (up to 15s)" : "🔮 Generate";
   return (
     <button

@@ -129,7 +129,7 @@ export const RegexGeneratorForm = () => {
           )}
         </TooltipProvider>
 
-        <MagicButton />
+        <MagicButton pending={isSubmitting} />
       </form>
     </>
   );
