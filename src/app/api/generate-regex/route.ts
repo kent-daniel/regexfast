@@ -1,32 +1,8 @@
-"use server";
 import { z } from "zod";
-import { GeneratorFormResponse, Match } from "@/models";
-import {
-  generateRegexWithAIUseCase,
-  getRegexUseCase,
-} from "@/use-cases/use-cases";
+import { GeneratorFormResponse } from "@/models";
+import { generateRegexWithAIUseCase } from "@/use-cases/use-cases";
 
-export async function getRegexMatches(
-  pattern: string,
-  text: string,
-  flag: string,
-  language?: string
-): Promise<{ status: string; timeSpent: string; matches: Match[] }> {
-  try {
-    if (text.length === 0 || pattern.length === 0) {
-      return { status: "invalid", timeSpent: `0`, matches: [] };
-    }
-    const { status, timeSpent, matches } = await getRegexUseCase(
-      pattern,
-      text,
-      flag
-    );
-    return { status, timeSpent: timeSpent.toFixed(2), matches };
-  } catch (error) {
-    // console.error("Error in getRegexMatches:", error);
-    return { status: "invalid", timeSpent: `0`, matches: [] };
-  }
-}
+export const runtime = "edge";
 
 const formDataSchema = z.object({
   description: z.string().refine((val) => val.trim() !== "", {
@@ -50,11 +26,10 @@ const formDataSchema = z.object({
     }),
 });
 
-export async function submitForm(
-  formData: FormData
-): Promise<GeneratorFormResponse> {
+export async function POST(request: Request): Promise<Response> {
   try {
-    // Convert FormData to plain object for validation
+    const formData = await request.formData();
+
     const data = {
       description: formData.get("description") as string,
       shouldMatch: formData.get("shouldMatch") as string,
@@ -62,10 +37,8 @@ export async function submitForm(
       info: formData.get("info") as string,
     };
 
-    // Validate the data
     const validatedData = formDataSchema.parse(data);
 
-    // Send to use case
     const result = await generateRegexWithAIUseCase({
       description: validatedData.description,
       shouldMatch: validatedData.shouldMatch,
@@ -73,18 +46,20 @@ export async function submitForm(
       info: validatedData.info,
     });
 
-    return result;
+    return Response.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return {
+      const response: GeneratorFormResponse = {
         success: false,
         errors: error.errors.map((e) => `${e.message}`),
       };
+      return Response.json(response);
     } else {
-      return {
+      const response: GeneratorFormResponse = {
         success: false,
         errors: ["Something went wrong"],
       };
+      return Response.json(response);
     }
   }
 }

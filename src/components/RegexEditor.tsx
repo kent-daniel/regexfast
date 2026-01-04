@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { getRegexMatches } from "../actions/actions";
 import { CopyInput } from "./CopyInput";
 import RegexEditorOptions from "./RegexEditorOptions";
 import { MatchHighlightArea } from "./MatchHighlightArea";
@@ -59,12 +58,14 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
 
   const fetchMatches = async (pattern: string, text: string, flags: string) => {
     try {
-      const { matches, timeSpent, status } = await getRegexMatches(
-        pattern,
-        text,
-        flags,
-        language
-      );
+      const res = await fetch("/api/regex-matches", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pattern, text, flag: flags }),
+      });
+      const { matches, timeSpent, status } = await res.json();
       setMatches(matches);
       setTimeSpent(timeSpent);
       setServerStatus(status);

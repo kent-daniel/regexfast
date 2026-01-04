@@ -2,7 +2,6 @@
 import React, { useRef, useState } from "react";
 import { MagicButton } from "./ui/MagicButton";
 import { Textarea } from "./ui/textarea";
-import { submitForm } from "@/actions/actions";
 import { useRegexResult } from "./RegexResultContext";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import {
@@ -11,11 +10,40 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { GeneratorFormResponse } from "@/models";
 
 export const RegexGeneratorForm = () => {
   const ref = useRef<HTMLFormElement>(null);
   const { setResult } = useRegexResult();
   const [formErrors, setFormErrors] = useState<string[] | undefined>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      const formData = new FormData(e.currentTarget);
+      const res = await fetch("/api/generate-regex", {
+        method: "POST",
+        body: formData,
+      });
+      
+      const response: GeneratorFormResponse = await res.json();
+      
+      if (response.result) {
+        setResult(response.result);
+        setFormErrors([]);
+      }
+      if (response.errors) {
+        setFormErrors(response.errors);
+      }
+    } catch (error) {
+      setFormErrors(["Something went wrong. Please try again."]);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -24,16 +52,7 @@ export const RegexGeneratorForm = () => {
       </h1>
       <form
         ref={ref}
-        action={async (formData) => {
-          const response = await submitForm(formData);
-          if (response.result) {
-            setResult(response.result);
-            setFormErrors([]);
-          }
-          if (response.errors) {
-            setFormErrors(response.errors);
-          }
-        }}
+        onSubmit={handleSubmit}
         className="py-3"
       >
         <TooltipProvider>
