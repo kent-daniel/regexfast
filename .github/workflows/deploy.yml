@@ -64,7 +64,7 @@ jobs:
         with:
           script: |
             const prNumber = context.issue.number;
-            const workerUrl = '${{ steps.deploy-worker.outputs.deployment-url }}' || 'https://preview.agent-worker-do.workers.dev';
+            const workerUrl = '${{ steps.deploy-worker.outputs.deployment-url }}' || 'https://agent-worker-do-preview.workers.dev';
             const pagesUrl = '${{ steps.deploy-pages.outputs.deployment-url }}' || 'https://${{ github.head_ref }}.${{ env.PAGES_PROJECT }}.pages.dev';
             
             const { data: comments } = await github.rest.issues.listComments({

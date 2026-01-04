@@ -4,6 +4,7 @@ interface CloudflareEnv {
   REPLICATE_API_TOKEN: string;
   NEXT_PUBLIC_POSTHOG_KEY: string;
   NEXT_PUBLIC_POSTHOG_HOST: string;
+  NEXT_PUBLIC_WORKER_URL?: string; // Worker URL for production/preview (e.g., https://agent-worker-do.workers.dev)
 }
 
 /* eslint-disable */

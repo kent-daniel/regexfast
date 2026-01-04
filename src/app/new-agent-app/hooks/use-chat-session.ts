@@ -39,6 +39,9 @@ export function useChatSession() {
   const agent = useAgent({
     agent: "chat",
     name: sessionId || "default",
+    // In production/preview, connect directly to the Worker URL
+    // In development, Next.js rewrites /agents/* to the Worker
+    host: process.env.NEXT_PUBLIC_WORKER_URL || undefined,
     onStateUpdate: (state) => {
       setAgentState(state as ChatState);
     }
