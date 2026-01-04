@@ -7,6 +7,7 @@
     "dev:worker": "wrangler dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:worker\"",
     "build": "next build",
+    "build:pages": "npx @cloudflare/next-on-pages",
     "build:worker": "wrangler deploy --dry-run",
     "deploy:worker": "wrangler deploy",
     "start": "next start",
