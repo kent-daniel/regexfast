@@ -13,6 +13,7 @@ import { createGateway, type GatewayProvider } from "@ai-sdk/gateway";
 import { processToolCalls, cleanupMessages } from "./utils";
 import { createExecutions, createTools } from "./tools";
 import { SUBAGENT_STATUS_DATA_PART_TYPE, TOKEN_LIMIT } from "./shared";
+import { handleRegexTestWithCORS } from "./endpoints/regex-test";
 // import { env } from "cloudflare:workers";
 
 // Use the global Cloudflare.Env from env.d.ts
@@ -404,12 +405,19 @@ export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
     const url = new URL(request.url);
 
+    // Health check / API key validation endpoint
     if (url.pathname === "/check-open-ai-key") {
       const hasGatewayKey = !!env.AI_GATEWAY_API_KEY;
       return Response.json({
         success: hasGatewayKey
       });
     }
+
+    // Regex test endpoint - standalone regex testing without chat
+    if (url.pathname === "/api/regex/test") {
+      return handleRegexTestWithCORS(request, env);
+    }
+
     if (!env.AI_GATEWAY_API_KEY) {
       console.error(
         "AI_GATEWAY_API_KEY is not set, don't forget to set it locally in .dev.vars, and use `wrangler secret bulk .dev.vars` to upload it to production"
