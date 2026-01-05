@@ -1,7 +1,11 @@
 "use client";
 
-import Chat from "./chat";
+import dynamic from "next/dynamic";
 import { Providers } from "@/providers";
+
+// Dynamically import Chat with SSR disabled to prevent prerender errors
+// (useAgent tries to establish WebSocket connections which fail during static generation)
+const Chat = dynamic(() => import("./chat"), { ssr: false });
 
 export default function NewAgentAppPage() {
 	return (

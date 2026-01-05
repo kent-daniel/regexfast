@@ -25,6 +25,7 @@ export function useChatSession() {
 
   useEffect(() => {
     const stored = sessionStorage.getItem("agent-session-id");
+    console.log(process.env.NEXT_PUBLIC_WORKER_URL);
     if (stored) {
       setSessionId(stored);
     } else {
