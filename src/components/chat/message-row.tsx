@@ -6,7 +6,7 @@ import { MemoizedMarkdown } from "@/components/chat/memoized-markdown";
 import { ToolInvocationCard } from "@/components/chat/tool-invocation-card";
 import type { SubagentStatusEvent } from "@/agent-worker/shared";
 
-import { SparkleIcon, UserIcon } from "@phosphor-icons/react";
+import { SparkleIcon } from "@phosphor-icons/react";
 
 export type MessageRowModel = {
   key: string;
@@ -40,44 +40,44 @@ export function MessageRow({
   const isUser = model.role === "user";
 
   return (
-    <div>
+    <div className="animate-[message-enter_0.2s_ease-out]">
       {showDebug && model.message && (
-        <pre className="text-[11px] text-slate-500 overflow-scroll bg-[#1C232D] p-2 rounded mb-2">
+        <pre className="text-[11px] text-slate-500 overflow-scroll bg-[#1C232D] p-2 rounded-lg mb-2 border border-white/5">
           {JSON.stringify(model.message, null, 2)}
         </pre>
       )}
 
       <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
         <div
-          className={`flex gap-3 max-w-[92%] ${isUser ? "flex-row-reverse" : "flex-row"}`}
+          className={`flex gap-3 max-w-[88%] ${isUser ? "flex-row-reverse" : "flex-row"}`}
         >
-          {/* Only show avatar for assistant, not for user (cleaner Copilot style) */}
+          {/* Copilot sparkle avatar for assistant only - clean Copilot style */}
           {!isUser && model.showAvatar ? (
-            <div className="flex-shrink-0">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
-                <SparkleIcon size={10} className="text-white" weight="fill" />
+            <div className="flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center shadow-sm shadow-blue-500/20">
+                <SparkleIcon size={12} className="text-white" weight="fill" />
               </div>
             </div>
           ) : !isUser ? (
-            <div className="w-5" />
+            <div className="w-6" />
           ) : null}
 
           <div className="flex-1 min-w-0">
-            <div>
+            <div className="space-y-3">
               {model.message?.parts?.map((part, i) => {
                 if (part.type === "text") {
                   return (
                     // biome-ignore lint/suspicious/noArrayIndexKey: immutable index
                     <div
                       key={i}
-                      className={`text-[13px] leading-relaxed ${
+                      className={`text-sm leading-relaxed ${
                         isUser
-                          ? "bg-[#1C232D] text-slate-100 rounded-xl rounded-br-sm px-4 py-2.5"
-                          : "text-slate-200"
+                          ? "bg-zinc-800 text-slate-50 rounded-xl rounded-br-sm px-4 py-3"
+                          : "text-slate-50"
                       }`}
                     >
                       {part.text.startsWith("scheduled message") && (
-                        <span className="text-[11px] text-blue-400 mb-1 block">
+                        <span className="text-xs text-blue-400 mb-1 block font-medium">
                           🕒 Scheduled
                         </span>
                       )}
@@ -145,8 +145,8 @@ export function MessageRow({
               })}
 
               {model.showThinkingTail && (
-                <div className="flex items-center text-[13px] text-slate-400 animate-pulse">
-                  Thinking…
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <span>Thinking…</span>
                 </div>
               )}
             </div>

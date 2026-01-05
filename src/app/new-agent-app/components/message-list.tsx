@@ -18,6 +18,7 @@ type MessageListProps = {
   addToolApprovalResponse?: ChatAddToolApproveResponseFunction;
   abortedToolCallIds: Set<string>;
   subagentStatusByToolCallId: Record<string, SubagentStatusEvent>;
+  onSuggestionClick?: (suggestion: string) => void;
 };
 
 export function MessageList({
@@ -27,7 +28,8 @@ export function MessageList({
   addToolResult,
   addToolApprovalResponse,
   abortedToolCallIds,
-  subagentStatusByToolCallId
+  subagentStatusByToolCallId,
+  onSuggestionClick
 }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -50,10 +52,10 @@ export function MessageList({
   return (
     <div 
       ref={containerRef} 
-      className="flex-1 overflow-y-auto px-5 py-6 space-y-5 min-h-0 overscroll-contain"
+      className="flex-1 overflow-y-auto px-5 py-6 space-y-6 min-h-0 overscroll-contain"
     >
       {isEmpty ? (
-        <EmptyState />
+        <EmptyState onSuggestionClick={onSuggestionClick} />
       ) : (
         rows.map((row) => (
           <MessageRow

@@ -45,6 +45,10 @@ export default function Chat() {
     setAgentInput(e.target.value);
   };
 
+  const handleSuggestionClick = (suggestion: string) => {
+    setAgentInput(suggestion);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!agentInput.trim()) return;
@@ -78,6 +82,7 @@ export default function Chat() {
           showDebug={showDebug}
           onToggleDebug={() => setShowDebug((prev) => !prev)}
           onClearHistory={clearHistory}
+          isStreaming={isStreaming}
         />
 
         <MessageList
@@ -88,6 +93,7 @@ export default function Chat() {
           addToolApprovalResponse={addToolApprovalResponse}
           abortedToolCallIds={abortedToolCallIds}
           subagentStatusByToolCallId={subagentStatusByToolCallId}
+          onSuggestionClick={handleSuggestionClick}
         />
 
         <ChatInput
