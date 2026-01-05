@@ -213,6 +213,7 @@ export async function generateRegex(
           iterations: i + 1,
           sandboxId: sandboxRef.current.id,
           runtime,
+          testResults,
           ...(includeHistory && { history: [...history, { candidate, testResults, reflection: "" }] }),
         };
       }
@@ -239,6 +240,9 @@ export async function generateRegex(
     throw error;
   }
 
+  // Get the last test results from history for the failed case
+  const lastTestResults = history[history.length - 1]?.testResults;
+
   console.log(`[RegexAgent] Max iterations reached, returning best effort`);
   return {
     ...(currentCandidate ?? { pattern: ".*", flags: "" }),
@@ -246,6 +250,7 @@ export async function generateRegex(
     iterations: maxIterations,
     sandboxId: sandboxRef.current.id,
     runtime,
+    testResults: lastTestResults,
     ...(includeHistory && { history }),
   };
 }

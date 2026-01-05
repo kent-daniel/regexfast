@@ -176,4 +176,6 @@ export interface RegexGenerationResult {
   runtime: SandboxRuntime;
   /** Complete iteration history for debugging */
   history?: IterationResult[];
+  /** Final test results (for UI display) */
+  testResults?: TestResult;
 }

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { APPROVAL } from "@/agent-worker/shared";
 import type { SubagentPhase } from "@/agent-worker/shared";
 import { useState, useEffect } from "react";
+import { RegexResultCard } from "./regex-result-card";
 
 interface ToolInvocationCardProps {
   toolUIPart: ToolUIPart;
@@ -108,6 +109,64 @@ function getPhaseLabel(phase?: SubagentPhase): string | null {
   }
 }
 
+/**
+ * Check if this is a regex generation tool
+ */
+function isRegexTool(toolName: string): boolean {
+  return toolName === "generateMatchRegex" || toolName === "generateCaptureRegex";
+}
+
+/**
+ * Extract regex result from tool output
+ */
+function getRegexResult(output: unknown): {
+  pattern: string;
+  flags: string;
+  success: boolean;
+  iterations: number;
+  runtime: string;
+  testResults?: {
+    passed: number;
+    failed: number;
+    total: number;
+    mode?: "match" | "capture";
+    details?: Array<{
+      input: string;
+      passed: boolean;
+      expected?: string | (string | null)[];
+      actual?: string | (string | null)[] | null;
+    }>;
+  };
+  example?: string;
+} | null {
+  const result = output as Record<string, unknown> | undefined;
+  if (!result || typeof result.pattern !== "string") return null;
+  
+  // Type-safe extraction of testResults
+  const testResults = result.testResults as {
+    passed: number;
+    failed: number;
+    total: number;
+    mode?: "match" | "capture";
+    details?: Array<{
+      input: string;
+      passed: boolean;
+      expected?: string | (string | null)[];
+      actual?: string | (string | null)[] | null;
+    }>;
+  } | undefined;
+  
+  return {
+    pattern: result.pattern as string,
+    flags: (result.flags as string) || "",
+    success: result.success === true,
+    iterations: (result.iterations as number) || 1,
+    runtime: (result.runtime as string) || "javascript",
+    testResults,
+    example: result.example as string | undefined,
+  };
+}
+
 export function ToolInvocationCard({
   toolUIPart,
   toolCallId,
@@ -127,6 +186,9 @@ export function ToolInvocationCard({
 
   // Determine if this is a code generation tool
   const isCodeGenerationTool = isApprovalRequiredTool(rawToolName);
+  
+  // Determine if this is a regex tool
+  const isRegex = isRegexTool(rawToolName);
 
   // State for expandable error details
   const [isExpanded, setIsExpanded] = useState(false);
@@ -238,6 +300,24 @@ export function ToolInvocationCard({
   // Completed State - Success or Error
   if (isCompleted && outputInfo) {
     const { text, isError, details } = outputInfo;
+    
+    // Special handling for regex tools - use RegexResultCard
+    if (isRegex && "output" in toolUIPart) {
+      const regexResult = getRegexResult(toolUIPart.output);
+      if (regexResult) {
+        return (
+          <RegexResultCard
+            pattern={regexResult.pattern}
+            flags={regexResult.flags}
+            success={regexResult.success}
+            iterations={regexResult.iterations}
+            runtime={regexResult.runtime}
+            testResults={regexResult.testResults}
+            example={regexResult.example}
+          />
+        );
+      }
+    }
     
     // Error state with expandable details
     if (isError) {

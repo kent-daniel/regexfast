@@ -9,7 +9,7 @@ export const RegexPlaygroundSection = () => {
       <div className="flex gap-8 h-[700px] bg-[#08090D] rounded-2xl p-6 w-full">
         <RegexResultProvider>
           {/* Chat Panel - Fixed width with height limit */}
-          <div className="w-[480px] flex-shrink-0 h-full">
+          <div className="w-[580px] flex-shrink-0 h-full">
             <PlaygroundChat />
           </div>
           
