@@ -2,6 +2,7 @@ import { marked } from "marked";
 import type { Tokens } from "marked";
 import { memo, useMemo } from "react";
 import { Streamdown } from "streamdown";
+import type { BundledTheme } from 'shiki';
 
 function parseMarkdownIntoBlocks(markdown: string): string[] {
   const tokens: TokensList = marked.lexer(markdown);
@@ -13,7 +14,7 @@ type TokensList = Array<Tokens.Generic & { raw: string }>;
 const MemoizedMarkdownBlock = memo(
   ({ content }: { content: string }) => (
     <div className="markdown-body">
-      <Streamdown>{content}</Streamdown>
+      <Streamdown shikiTheme={['github-dark', 'github-dark-default']}>{content}</Streamdown>
     </div>
   ),
   (prevProps, nextProps) => prevProps.content === nextProps.content

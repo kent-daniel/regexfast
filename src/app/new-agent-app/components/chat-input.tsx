@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { PaperPlaneTiltIcon, StopIcon } from "@phosphor-icons/react";
+import { ArrowUpIcon, StopIcon, WarningCircle } from "@phosphor-icons/react";
 
 type ChatInputProps = {
   value: string;
@@ -11,6 +11,7 @@ type ChatInputProps = {
   onStop: () => void;
   isStreaming: boolean;
   isDisabled: boolean;
+  isLimitReached?: boolean;
   activeToolCalls?: string[];
 };
 
@@ -21,12 +22,14 @@ export function ChatInput({
   onStop,
   isStreaming,
   isDisabled,
+  isLimitReached = false,
   activeToolCalls = []
 }: ChatInputProps) {
   const [textareaHeight, setTextareaHeight] = useState("auto");
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    if (isLimitReached) return;
     onSubmit(e);
     setTextareaHeight("auto");
   };
@@ -46,52 +49,67 @@ export function ChatInput({
     setTextareaHeight(`${e.target.scrollHeight}px`);
   };
 
+  const canSubmit = !isDisabled && !isLimitReached && value.trim().length > 0;
+
+  // Show limit reached banner
+  if (isLimitReached) {
+    return (
+      <div className="p-4 bg-[#151B23] border-t border-white/5 flex-shrink-0">
+        <div className="flex items-center gap-3 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+          <WarningCircle size={20} className="text-red-400 flex-shrink-0" weight="fill" />
+          <div className="flex-1">
+            <p className="text-sm text-red-300 font-medium">Token limit reached</p>
+            <p className="text-xs text-red-400/80">Clear the chat to start a new session.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-4 bg-white absolute bottom-0 left-0 right-0 z-10 dark:bg-neutral-950"
+      className="p-4 bg-[#151B23] border-t border-white/5 flex-shrink-0"
     >
-      <div className="flex items-center gap-2">
-        <div className="flex-1 relative">
-          <Textarea
-            disabled={isDisabled}
-            placeholder={
-              isDisabled
-                ? "Please respond to the tool confirmation above..."
-                : "Send a message..."
-            }
-            className="flex w-full border border-neutral-200 dark:border-neutral-700 px-3 py-2 ring-offset-background placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300 dark:focus-visible:ring-neutral-700 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl text-base! pb-10 dark:bg-neutral-900"
-            value={value}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            rows={2}
-            style={{ height: textareaHeight }}
-          />
-          <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
-            {isStreaming ? (
-              <button
-                type="button"
-                onClick={onStop}
-                className="inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-1.5 h-fit border border-neutral-200 dark:border-neutral-800"
-                aria-label={
-                  activeToolCalls.length > 0
-                    ? `Stop generation (tools: ${activeToolCalls.join(", ")})`
-                    : "Stop generation"
-                }
-              >
-                <StopIcon size={16} />
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-1.5 h-fit border border-neutral-200 dark:border-neutral-800"
-                disabled={isDisabled || !value.trim()}
-                aria-label="Send message"
-              >
-                <PaperPlaneTiltIcon size={16} />
-              </button>
-            )}
-          </div>
+      <div className="relative">
+        <Textarea
+          disabled={isDisabled}
+          placeholder={
+            isDisabled
+              ? "Please respond to the tool confirmation above..."
+              : "Describe what you want to match..."
+          }
+          className="w-full border border-white/10 bg-[#1C232D] text-slate-50 text-sm px-4 py-3 pr-12 rounded-xl placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500 disabled:cursor-not-allowed disabled:opacity-50 min-h-[52px] max-h-[180px] overflow-hidden resize-none transition-colors"
+          value={value}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          rows={1}
+          style={{ height: textareaHeight }}
+        />
+        <div className="absolute right-3 bottom-3">
+          {isStreaming ? (
+            <button
+              type="button"
+              onClick={onStop}
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 transition-colors shadow-sm"
+              aria-label="Stop generation"
+            >
+              <StopIcon size={14} className="text-white" weight="bold" />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 shadow-sm ${
+                canSubmit
+                  ? "bg-blue-500 hover:bg-blue-600 hover:shadow-md active:scale-95"
+                  : "bg-zinc-700 opacity-40 cursor-not-allowed"
+              }`}
+              disabled={!canSubmit}
+              aria-label="Send message"
+            >
+              <ArrowUpIcon size={16} className="text-white" weight="bold" />
+            </button>
+          )}
         </div>
       </div>
     </form>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect } from "react";
 import type { ChatAddToolApproveResponseFunction } from "ai";
 import { MessageRow, type MessageRowModel } from "@/components/chat/message-row";
 import type { SubagentStatusEvent } from "@/agent-worker/shared";
@@ -18,6 +18,7 @@ type MessageListProps = {
   addToolApprovalResponse?: ChatAddToolApproveResponseFunction;
   abortedToolCallIds: Set<string>;
   subagentStatusByToolCallId: Record<string, SubagentStatusEvent>;
+  onSuggestionClick?: (suggestion: string) => void;
 };
 
 export function MessageList({
@@ -27,23 +28,34 @@ export function MessageList({
   addToolResult,
   addToolApprovalResponse,
   abortedToolCallIds,
-  subagentStatusByToolCallId
+  subagentStatusByToolCallId,
+  onSuggestionClick
 }: MessageListProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
+  // Scroll to bottom - contained within the container only
+  const scrollToBottom = () => {
+    const container = containerRef.current;
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+  };
 
-  // Scroll to bottom on mount and when rows change
+  // Scroll when rows change (new messages or streaming content)
   useEffect(() => {
     scrollToBottom();
-  }, [scrollToBottom, rows.length]);
+  }, [rows]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24 max-h-[calc(100vh-10rem)]">
+    <div 
+      ref={containerRef} 
+      className="flex-1 overflow-y-auto px-5 py-6 space-y-6 min-h-0 overscroll-contain"
+    >
       {isEmpty ? (
-        <EmptyState />
+        <EmptyState onSuggestionClick={onSuggestionClick} />
       ) : (
         rows.map((row) => (
           <MessageRow
@@ -57,7 +69,6 @@ export function MessageList({
           />
         ))
       )}
-      <div ref={messagesEndRef} />
     </div>
   );
 }

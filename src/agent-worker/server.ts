@@ -12,7 +12,7 @@ import {
 import { createGateway, type GatewayProvider } from "@ai-sdk/gateway";
 import { processToolCalls, cleanupMessages } from "./utils";
 import { createExecutions, createTools } from "./tools";
-import { SUBAGENT_STATUS_DATA_PART_TYPE } from "./shared";
+import { SUBAGENT_STATUS_DATA_PART_TYPE, TOKEN_LIMIT } from "./shared";
 // import { env } from "cloudflare:workers";
 
 // Use the global Cloudflare.Env from env.d.ts
@@ -193,6 +193,22 @@ export class Chat extends AIChatAgent<Env, ChatState> {
     onFinish: StreamTextOnFinishCallback<ToolSet>,
     options?: { abortSignal?: AbortSignal }
   ) {
+    // Check if token limit is reached before processing
+    const currentTokens = (this.state as ChatState | undefined)?.tokenUsage?.totalTokens ?? 0;
+    if (currentTokens >= TOKEN_LIMIT) {
+      // Return a stream with an error message
+      const stream = createUIMessageStream({
+        execute: async ({ writer }) => {
+          writer.write({
+            type: "text-delta",
+            id: "token-limit-error",
+            delta: `⚠️ **Token limit reached**\n\nYou've used ${currentTokens.toLocaleString()} of ${TOKEN_LIMIT.toLocaleString()} tokens. Please clear the chat to start a new session.`
+          });
+        }
+      });
+      return createUIMessageStreamResponse({ stream });
+    }
+
     // Make abort signal available to tool/subagent executions.
     const requestAbortSignal = options?.abortSignal;
     this.currentAbortSignal = requestAbortSignal;

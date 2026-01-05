@@ -4,6 +4,9 @@ export const APPROVAL = {
   NO: "No, denied."
 } as const;
 
+// Token limit for sessions
+export const TOKEN_LIMIT = 250_000;
+
 export const SUBAGENT_STATUS_DATA_PART_TYPE = "data-subagent-status" as const;
 
 export type SubagentPhase = "generating" | "executing" | "evaluating";

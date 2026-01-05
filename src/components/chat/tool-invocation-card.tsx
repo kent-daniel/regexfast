@@ -1,8 +1,9 @@
 import type { ToolUIPart, ChatAddToolApproveResponseFunction } from "ai";
-import { WrenchIcon, CheckCircleIcon, CircleNotchIcon, WarningCircleIcon, CodeIcon } from "@phosphor-icons/react";
+import { Check, X, CircleNotch, Warning, Code, CaretDown, CaretUp } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { APPROVAL } from "@/agent-worker/shared";
 import type { SubagentPhase } from "@/agent-worker/shared";
+import { useState, useEffect } from "react";
 
 interface ToolInvocationCardProps {
   toolUIPart: ToolUIPart;
@@ -42,20 +43,68 @@ Test cases: ${input.tests?.length || 0}`;
 }
 
 /**
- * 
- * 
- * get a user friendly name for the tool 
+ * Get user-friendly tool name with action verb
  */
 function getFriendlyToolName(toolName: string): string {
   switch (toolName) {
     case "generateMatchRegex":
-      return "Working on match regex";
+      return "Generating match regex";
     case "generateCaptureRegex":
-      return "Working on capture regex";
+      return "Generating capture regex";
     case "generateCode":
       return "Generating code";
     default:
       return toolName;
+  }
+}
+
+/**
+ * Get compact completed message
+ */
+function getCompletedMessage(toolName: string, output: unknown): { text: string; isError: boolean; details?: string[] } {
+  const result = output as { 
+    success?: boolean; 
+    error?: string; 
+    aborted?: boolean;
+    testResults?: { passed: number; failed: number; total: number };
+    failedTests?: Array<{ input: string; expected: string; actual: string }>;
+  } | undefined;
+  
+  if (result?.aborted) {
+    return { text: "Aborted by user", isError: true };
+  }
+  
+  if (result?.success === false) {
+    const details = result.failedTests?.map(t => 
+      `"${t.input}" — expected ${t.expected}, got ${t.actual}`
+    );
+    return { 
+      text: result.error || "Failed", 
+      isError: true,
+      details
+    };
+  }
+  
+  if (result?.testResults) {
+    const { passed, total } = result.testResults;
+    return { 
+      text: `Completed • ${passed}/${total} tests passed`, 
+      isError: false 
+    };
+  }
+  
+  return { text: "Completed", isError: false };
+}
+
+/**
+ * Get phase label for subagent status
+ */
+function getPhaseLabel(phase?: SubagentPhase): string | null {
+  switch (phase) {
+    case "generating": return "Generating pattern";
+    case "executing": return "Testing regex";
+    case "evaluating": return "Evaluating results";
+    default: return null;
   }
 }
 
@@ -68,6 +117,7 @@ export function ToolInvocationCard({
   addToolApprovalResponse
 }: ToolInvocationCardProps) {
   const toolName = getFriendlyToolName(toolUIPart.type.replace("tool-", ""));
+  const rawToolName = toolUIPart.type.replace("tool-", "");
   const isCompleted = toolUIPart.state === "output-available";
   const isRunning = toolUIPart.state === "input-streaming" || toolUIPart.state === "input-available";
   
@@ -76,55 +126,30 @@ export function ToolInvocationCard({
   const needsApproval = needsConfirmation && toolUIPart.state === "input-available";
 
   // Determine if this is a code generation tool
-  const isCodeGenerationTool = isApprovalRequiredTool(toolName);
+  const isCodeGenerationTool = isApprovalRequiredTool(rawToolName);
 
-  // Get status info
-  const getStatusInfo = () => {
-    // AI SDK 6 approval-requested state takes precedence
-    if (isApprovalRequested) {
-      return {
-        icon: <WarningCircleIcon size={14} className="text-amber-500" />,
-        text: "Awaiting approval",
-        color: "text-amber-500"
-      };
-    }
-    if (needsApproval) {
-      return {
-        icon: <WarningCircleIcon size={14} className="text-amber-500" />,
-        text: "Waiting for approval",
-        color: "text-amber-500"
-      };
-    }
-    if (isCompleted) {
-      return {
-        icon: <CheckCircleIcon size={14} className="text-green-500" />,
-        text: "Completed",
-        color: "text-green-500"
-      };
-    }
-    if (isRunning) {
-      return {
-        icon: <CircleNotchIcon size={14} className="text-purple-500 animate-spin" />,
-        text: "Running",
-        color: "text-purple-500"
-      };
-    }
-    return {
-      icon: <WrenchIcon size={14} className="text-neutral-400" />,
-      text: "Pending",
-      color: "text-neutral-400"
-    };
-  };
+  // State for expandable error details
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // State for elapsed time
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [startTime] = useState(() => Date.now());
 
-  const statusInfo = getStatusInfo();
+  // Update elapsed time while running
+  useEffect(() => {
+    if (!isRunning) return;
+    
+    const interval = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - startTime) / 100) / 10);
+    }, 100);
+    
+    return () => clearInterval(interval);
+  }, [isRunning, startTime]);
 
-  const phaseLabel = (() => {
-    if (!subagentPhase) return null;
-    if (subagentPhase === "generating") return "Generating";
-    if (subagentPhase === "executing") return "Executing";
-    if (subagentPhase === "evaluating") return "Evaluating";
-    return null;
-  })();
+  // Get output info for completed state
+  const outputInfo = isCompleted && "output" in toolUIPart 
+    ? getCompletedMessage(rawToolName, toolUIPart.output)
+    : null;
 
   // Handle AI SDK 6 approval response
   const handleApproval = (approved: boolean) => {
@@ -143,72 +168,134 @@ export function ToolInvocationCard({
     }
   };
 
-  return (
-    <div className="my-2 py-2 px-3 rounded-lg bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700/50">
-      <div className="flex items-center gap-2">
-        {isCodeGenerationTool ? (
-          <CodeIcon size={14} className="text-blue-500 shrink-0" />
-        ) : (
-          <WrenchIcon size={14} className="text-purple-500 shrink-0" />
-        )}
-        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          {toolName}
-        </span>
-        {phaseLabel && isRunning && (
-          <span className="text-xs text-neutral-500 dark:text-neutral-400">
-            · {phaseLabel}
-          </span>
-        )}
-        <span className="flex items-center gap-1 text-xs ml-auto">
-          {statusInfo.icon}
-          <span className={statusInfo.color}>{statusInfo.text}</span>
-        </span>
-      </div>
+  const phaseLabel = getPhaseLabel(subagentPhase);
 
-      {/* AI SDK 6 approval-requested state */}
-      {isApprovalRequested && (
-        <div className="mt-2 pt-2 border-t border-neutral-200 dark:border-neutral-700/50">
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 whitespace-pre-wrap mb-3">
-            {getApprovalDescription(toolName, "input" in toolUIPart ? toolUIPart.input : {})}
+  // Approval Required State - Copilot style
+  if (isApprovalRequested || needsApproval) {
+    return (
+      <div className="my-2 rounded-lg bg-amber-500/10 border-l-2 border-l-amber-500 overflow-hidden transition-all duration-200">
+        <div className="flex items-center gap-2 px-3 py-2">
+          <Warning size={16} className="text-amber-500 shrink-0" weight="fill" />
+          <span className="text-sm text-slate-300">
+            {isCodeGenerationTool ? "Code execution requires approval" : "Awaiting approval"}
+          </span>
+        </div>
+        
+        <div className="px-3 pb-3 pt-1 border-t border-amber-500/20">
+          <p className="text-xs text-slate-400 whitespace-pre-wrap mb-3">
+            {getApprovalDescription(rawToolName, "input" in toolUIPart ? toolUIPart.input : {})}
           </p>
-          <div className="flex gap-2 justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleApproval(false)}
-            >
-              Deny
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => handleApproval(true)}
-            >
-              Approve
-            </Button>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500 flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full bg-green-500/20 flex items-center justify-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              </span>
+              Sandboxed
+            </span>
+            <div className="flex gap-2 ml-auto">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-3 text-xs text-slate-400 hover:text-slate-200 hover:bg-white/5"
+                onClick={() => handleApproval(false)}
+              >
+                Deny
+              </Button>
+              <Button
+                size="sm"
+                className="h-7 px-3 text-xs bg-blue-500 hover:bg-blue-600 text-white border-0"
+                onClick={() => handleApproval(true)}
+              >
+                Approve
+              </Button>
+            </div>
           </div>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {/* Legacy approval flow */}
-      {needsApproval && !isApprovalRequested && (
-        <div className="flex gap-2 justify-end mt-2 pt-2 border-t border-neutral-200 dark:border-neutral-700/50">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onSubmit({ toolCallId, result: APPROVAL.NO })}
+  // Running State - Compact inline
+  if (isRunning) {
+    return (
+      <div className="my-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border-l-2 border-l-blue-500 transition-all duration-200">
+        <CircleNotch size={16} className="text-blue-500 animate-spin shrink-0" />
+        <span className="text-sm text-slate-300">
+          {phaseLabel || toolName}...
+        </span>
+        {subagentPhase && (
+          <span className="text-xs text-slate-500">
+            {isCodeGenerationTool && <Code size={12} className="inline mr-1" />}
+          </span>
+        )}
+        <span className="ml-auto text-xs text-slate-500 tabular-nums">
+          {elapsedTime.toFixed(1)}s
+        </span>
+      </div>
+    );
+  }
+
+  // Completed State - Success or Error
+  if (isCompleted && outputInfo) {
+    const { text, isError, details } = outputInfo;
+    
+    // Error state with expandable details
+    if (isError) {
+      return (
+        <div className="my-2 rounded-lg bg-red-500/10 border-l-2 border-l-red-500 overflow-hidden transition-all duration-200">
+          <div 
+            className={`flex items-center gap-2 px-3 py-2 ${details?.length ? 'cursor-pointer hover:bg-red-500/5' : ''}`}
+            onClick={() => details?.length && setIsExpanded(!isExpanded)}
+            onKeyDown={(e) => e.key === 'Enter' && details?.length && setIsExpanded(!isExpanded)}
+            role={details?.length ? "button" : undefined}
+            tabIndex={details?.length ? 0 : undefined}
           >
-            Deny
-          </Button>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => onSubmit({ toolCallId, result: APPROVAL.YES })}
-          >
-            Allow
-          </Button>
+            <X size={16} className="text-red-500 shrink-0" weight="bold" />
+            <span className="text-sm text-slate-300">{text}</span>
+            {details?.length ? (
+              <button 
+                type="button"
+                className="ml-auto flex items-center gap-1 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+              >
+                {isExpanded ? (
+                  <>Hide <CaretUp size={12} /></>
+                ) : (
+                  <>Details <CaretDown size={12} /></>
+                )}
+              </button>
+            ) : null}
+          </div>
+          
+          {isExpanded && details?.length ? (
+            <div className="px-3 pb-3 pt-1 border-t border-red-500/20 space-y-1.5 animate-[expand_0.2s_ease-out]" role="region" aria-label="Error details">
+              {details.map((detail, i) => (
+                <p key={`detail-${detail.slice(0, 20)}-${i}`} className="text-xs text-slate-400 pl-6">
+                  <span aria-hidden="true">•</span> {detail}
+                </p>
+              ))}
+              <p className="text-xs text-slate-500 pl-6 pt-1 flex items-center gap-1">
+                <span aria-hidden="true">💡</span> Try adding more specific examples
+              </p>
+            </div>
+          ) : null}
         </div>
-      )}
+      );
+    }
+    
+    // Success state - compact
+    return (
+      <div className="my-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-green-500/10 border-l-2 border-l-green-500 transition-all duration-200">
+        <Check size={16} className="text-green-500 shrink-0" weight="bold" />
+        <span className="text-sm text-slate-300">{text}</span>
+      </div>
+    );
+  }
+
+  // Fallback/Pending state (rarely shown)
+  return (
+    <div className="my-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border-l-2 border-l-slate-500 transition-all duration-200">
+      <CircleNotch size={16} className="text-slate-400 shrink-0" />
+      <span className="text-sm text-slate-400">{toolName}</span>
     </div>
   );
 }

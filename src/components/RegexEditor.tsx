@@ -80,13 +80,13 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
 
   return (
     <div className={`px-2 w-full font-mono`}>
-      <h2 className="text-gray-300 mb-10  border-gray-600 scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0">
+      <h2 className="text-slate-50 mb-10 border-white/10 scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0">
         Regex Editor
       </h2>
       <div className="flex items-center justify-between mb-3">
         <label
           htmlFor="text"
-          className="block text-md font-medium text-gray-300"
+          className="block text-md font-medium text-slate-300"
         >
           Regex Options:
         </label>
@@ -106,19 +106,19 @@ const RegexEditor: React.FC<RegexEditorBaseProps> = ({
       <div className="flex items-center justify-between my-3">
         <label
           htmlFor="text"
-          className="block text-md font-medium text-gray-300"
+          className="block text-md font-medium text-slate-300"
         >
           Text Matches:
         </label>
         <div
           className={`text-sm ${
             serverStatus === "invalid"
-              ? "text-yellow-500"
+              ? "text-amber-500"
               : serverStatus === "success"
               ? "text-green-500"
               : serverStatus === "error"
               ? "text-red-500"
-              : "text-gray-300"
+              : "text-slate-400"
           }`}
         >
           {`${matches.length} matches • ${timeSpent}ms • ${serverStatus}`}

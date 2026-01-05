@@ -1,20 +1,27 @@
 import React from "react";
-import { RegexGeneratorForm } from "./RegexGeneratorForm";
+import { PlaygroundChat } from "./PlaygroundChat";
 import RegexEditor from "./RegexEditor";
 import { RegexResultProvider } from "./RegexResultContext";
 
 export const RegexPlaygroundSection = () => {
   return (
-    <section className="flex w-full justify-center text-gray-300 font-mono my-5 py-3">
-      <RegexResultProvider>
-        <div className="basis-1/3 ">
-          <RegexGeneratorForm />
-        </div>
-        <div className="flex basis-2/3">
-          <div className="m-5 h-full min-h-[1em] w-0.5 self-stretch bg-gradient-to-tr from-transparent via-indigo-500 to-transparent opacity-75 dark:via-neutral-200"></div>
-          <RegexEditor />
-        </div>
-      </RegexResultProvider>
+    <section className="w-full px-6 py-8">
+      <div className="flex gap-8 h-[700px] bg-[#08090D] rounded-2xl p-6 w-full">
+        <RegexResultProvider>
+          {/* Chat Panel - Fixed width with height limit */}
+          <div className="w-[480px] flex-shrink-0 h-full">
+            <PlaygroundChat />
+          </div>
+          
+          {/* Divider */}
+          <div className="w-px bg-gradient-to-b from-transparent via-blue-500/30 to-transparent flex-shrink-0" />
+          
+          {/* Editor Panel - Takes all remaining space */}
+          <div className="flex-1 min-w-0 overflow-auto">
+            <RegexEditor />
+          </div>
+        </RegexResultProvider>
+      </div>
     </section>
   );
 };

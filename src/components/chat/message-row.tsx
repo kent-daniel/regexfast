@@ -6,7 +6,7 @@ import { MemoizedMarkdown } from "@/components/chat/memoized-markdown";
 import { ToolInvocationCard } from "@/components/chat/tool-invocation-card";
 import type { SubagentStatusEvent } from "@/agent-worker/shared";
 
-import { SparkleIcon, UserIcon } from "@phosphor-icons/react";
+import { SparkleIcon } from "@phosphor-icons/react";
 
 export type MessageRowModel = {
   key: string;
@@ -40,56 +40,44 @@ export function MessageRow({
   const isUser = model.role === "user";
 
   return (
-    <div>
+    <div className="animate-[message-enter_0.2s_ease-out]">
       {showDebug && model.message && (
-        <pre className="text-xs text-neutral-500 overflow-scroll bg-neutral-100 dark:bg-neutral-800 p-2 rounded mb-2">
+        <pre className="text-[11px] text-slate-500 overflow-scroll bg-[#1C232D] p-2 rounded-lg mb-2 border border-white/5">
           {JSON.stringify(model.message, null, 2)}
         </pre>
       )}
 
       <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
         <div
-          className={`flex gap-3 max-w-[90%] ${isUser ? "flex-row-reverse" : "flex-row"}`}
+          className={`flex gap-3 max-w-[88%] ${isUser ? "flex-row-reverse" : "flex-row"}`}
         >
-          {model.showAvatar ? (
-            <div className="flex items-center gap-2">
-              <div
-                className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${
-                  isUser
-                    ? "bg-neutral-200 dark:bg-neutral-700"
-                    : "bg-gradient-to-br from-purple-500 to-purple-600"
-                }`}
-              >
-                {isUser ? (
-                  <UserIcon
-                    size={14}
-                    className="text-neutral-600 dark:text-neutral-300"
-                  />
-                ) : (
-                  <SparkleIcon size={14} className="text-white" weight="fill" />
-                )}
+          {/* Copilot sparkle avatar for assistant only */}
+          {!isUser && model.showAvatar ? (
+            <div className="flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center shadow-sm">
+                <SparkleIcon size={12} className="text-white" weight="fill" />
               </div>
             </div>
-          ) : (
-            <div className="w-7" />
-          )}
+          ) : !isUser ? (
+            <div className="w-6" />
+          ) : null}
 
           <div className="flex-1 min-w-0">
-            <div>
+            <div className="space-y-3">
               {model.message?.parts?.map((part, i) => {
                 if (part.type === "text") {
                   return (
                     // biome-ignore lint/suspicious/noArrayIndexKey: immutable index
                     <div
                       key={i}
-                      className={`${
+                      className={`text-sm leading-relaxed ${
                         isUser
-                          ? "bg-purple-500 text-white rounded-2xl rounded-br-md px-4 py-2"
-                          : ""
+                          ? "bg-zinc-800 text-slate-50 rounded-xl rounded-br-sm px-4 py-3 transition-colors duration-150 hover:bg-zinc-700/80"
+                          : "text-slate-50"
                       }`}
                     >
                       {part.text.startsWith("scheduled message") && (
-                        <span className="text-xs text-purple-400 mb-1 block">
+                        <span className="text-xs text-blue-400 mb-1 block font-medium">
                           🕒 Scheduled
                         </span>
                       )}
@@ -157,8 +145,8 @@ export function MessageRow({
               })}
 
               {model.showThinkingTail && (
-                <div className="flex items-center text-sm text-neutral-500 dark:text-neutral-400 animate-pulse">
-                  Thinking…
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <span>Thinking…</span>
                 </div>
               )}
             </div>

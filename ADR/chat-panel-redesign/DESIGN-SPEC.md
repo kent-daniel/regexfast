@@ -1,203 +1,513 @@
 # Chat Panel Redesign: Copilot Coding Agent Style
 
-**Status:** Proposed  
+**Status:** In Progress  
 **Created:** 2026-01-04  
+**Updated:** 2026-01-05  
 **Author:** Design Team  
 
 ---
 
 ## 1. Executive Summary
 
-This document outlines the design specification for overhauling the chat panel on the main page (left side - `RegexGeneratorForm`) to adopt a modern **Copilot Coding Agent** style design, migrating patterns from the new agent app (`/new-agent-app/`) while introducing refined copy, error states, and a cohesive color system.
+This document outlines the design specification for overhauling the **Regex Playground chat panel** to adopt a modern **GitHub Copilot**-inspired dark mode design. The focus is on:
+
+- **Dark mode first** - Professional, developer-focused aesthetic
+- **Expanded playground layout** - More breathing room for users
+- **Copilot-style chat UI** - Clean, minimal message bubbles
+- **Compact tool/subagent status** - Non-intrusive progress indicators
+- **Phased implementation** - Clear milestones for incremental delivery
 
 ---
 
 ## 2. Current State Analysis
 
-### 2.1 Main Page Chat (`RegexGeneratorForm`)
-- **Style:** Form-based input with static labels
-- **Colors:** Dark zinc background (`bg-zinc-800`), gray text
-- **Error handling:** Simple red text list
-- **UX:** Traditional form submission pattern
-- **Copy:** Static labels like "I want to generate regex for"
+### 2.1 Playground Section (`RegexPlaygroundSection`)
+- **Layout:** Fixed `h-[600px]`, cramped `basis-1/3` for chat
+- **Style:** White/light background with inconsistent dark mode
+- **Spacing:** Minimal padding, feels cluttered
+- **Chat:** Basic message bubbles, lacks polish
 
-### 2.2 New Agent App Chat
-- **Style:** Conversational UI with avatars
-- **Colors:** Purple gradient accents, neutral grays
-- **Error handling:** Minimal current implementation
-- **UX:** Streaming messages, tool invocations, thinking states
-- **Copy:** Generic "How can I help you today?"
+### 2.2 Current Issues
+- Chat panel feels cramped and visually unpolished
+- Light mode looks washed out, dark mode is inconsistent
+- Tool invocation cards take too much visual space
+- No cohesive Copilot-like aesthetic
+- Layout doesn't adapt well to content
 
 ---
 
 ## 3. Design Goals
 
-1. **Unify** the visual language between main page and agent app
-2. **Elevate** the experience to match GitHub Copilot's coding agent aesthetic
-3. **Improve** error states with actionable, friendly messaging
-4. **Refine** copy to be context-aware and conversational
-5. **Modernize** the color palette with a professional, dev-focused feel
+1. **Dark mode first** - GitHub/Copilot-inspired color palette as default
+2. **Expanded layout** - Give users more breathing room (wider chat, taller section)
+3. **Copilot aesthetic** - Clean message bubbles, subtle gradients, refined typography
+4. **Compact status** - Tool/subagent status stays minimal and non-intrusive
+5. **Phased delivery** - Implement incrementally with clear milestones
 
 ---
 
-## 4. Visual Design Specification
+## 4. Visual Design Specification (Tailwind CSS)
 
-### 4.1 Color Palette
+### 4.1 Color Palette (Dark Mode First)
 
-#### Primary Colors (Agent/AI Identity)
-```css
-/* Copilot-inspired gradient - subtle blue-to-purple */
---agent-gradient-start: 221 83% 53%;    /* #3B82F6 - Blue 500 */
---agent-gradient-end: 271 81% 56%;       /* #8B5CF6 - Violet 500 */
+#### Background Colors (Primary Surfaces)
+```tsx
+// GitHub/Copilot-inspired dark palette
+bg-[#08090D]     // Deepest background (playground section)
+bg-[#0D1117]     // Main chat background - PRIMARY
+bg-[#151B23]     // Elevated surfaces (header, input area)
+bg-[#1C232D]     // Cards, message bubbles, tool status
+bg-[#232B37]     // Hover states
 
-/* Accent for interactive elements */
---agent-accent: 217 91% 60%;             /* #3B82F6 - Bright blue */
---agent-accent-hover: 217 91% 50%;       /* Darker on hover */
+// Tailwind equivalents (approximate)
+bg-neutral-950   // ~#0a0a0a - close to deepest
+bg-zinc-950      // ~#09090b - close to primary
+bg-zinc-900      // ~#18181b - elevated
+bg-zinc-800      // ~#27272a - cards/bubbles
+bg-zinc-700      // ~#3f3f46 - hover
 ```
 
-#### Background Colors (Dark Mode First)
-```css
-/* Main surfaces */
---chat-bg-primary: 220 13% 5%;           /* #0A0C10 - Deep dark */
---chat-bg-secondary: 220 13% 8%;         /* #0D1117 - GitHub dark */
---chat-bg-tertiary: 220 13% 11%;         /* #161B22 - Elevated surface */
+#### Accent Colors (Copilot Blue-Purple Gradient)
+```tsx
+// Primary accent - Copilot signature blue
+text-blue-500         // #3b82f6 - Primary accent
+hover:text-blue-600   // Darker on hover
+bg-blue-500/10        // Subtle background tint
 
-/* Cards and overlays */
---chat-surface: 220 13% 14%;             /* #1C2128 - Card background */
---chat-surface-hover: 220 13% 18%;       /* Hover state */
+// Gradient for special elements (Copilot sparkle, send button)
+bg-gradient-to-r from-blue-500 to-violet-500
+// or
+bg-gradient-to-br from-blue-600 via-violet-600 to-purple-600
 ```
 
 #### Text Colors
-```css
-/* Primary content */
---text-primary: 210 17% 95%;             /* #F0F3F6 - High emphasis */
---text-secondary: 215 14% 65%;           /* #8B949E - Medium emphasis */
---text-tertiary: 215 14% 45%;            /* #6E7681 - Low emphasis */
---text-muted: 215 14% 35%;               /* #484F58 - Disabled/hints */
-```
-
-#### State Colors
-```css
-/* Success states */
---success-bg: 142 76% 10%;               /* Dark green tint */
---success-text: 142 76% 60%;             /* #22C55E - Green 500 */
---success-border: 142 76% 20%;
-
-/* Error states */
---error-bg: 0 84% 10%;                   /* Dark red tint */
---error-text: 0 84% 65%;                 /* #EF4444 - Red 500 */
---error-border: 0 84% 20%;
-
-/* Warning states */
---warning-bg: 38 92% 10%;                /* Dark amber tint */
---warning-text: 38 92% 60%;              /* #F59E0B - Amber 500 */
---warning-border: 38 92% 20%;
-
-/* Info/Processing states */
---info-bg: 217 91% 10%;                  /* Dark blue tint */
---info-text: 217 91% 60%;                /* #3B82F6 - Blue 500 */
---info-border: 217 91% 20%;
+```tsx
+// High contrast for dark backgrounds
+text-slate-50      // #f8fafc - Primary text (headings, body)
+text-slate-400     // #94a3b8 - Secondary text (descriptions)
+text-slate-500     // #64748b - Tertiary/muted text
+text-slate-600     // #475569 - Disabled text
 ```
 
 #### Border Colors
-```css
---border-subtle: 215 14% 15%;            /* Barely visible */
---border-default: 215 14% 20%;           /* Normal borders */
---border-emphasis: 215 14% 30%;          /* Focus/active states */
+```tsx
+border-white/5      // Barely visible borders
+border-white/10     // Default borders
+border-white/20     // Focus/emphasis borders
+border-blue-500     // Active/accent borders
 ```
 
-### 4.2 Typography
+#### State Colors (Compact for tool status)
+```tsx
+// Success - Green
+text-green-500      bg-green-500/10     border-l-green-500
 
-```css
-/* Font family - System stack optimized for code/dev environments */
---font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
---font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+// Error - Red  
+text-red-500        bg-red-500/10       border-l-red-500
 
-/* Font sizes */
---text-xs: 0.75rem;      /* 12px - timestamps, metadata */
---text-sm: 0.875rem;     /* 14px - body text, messages */
---text-base: 1rem;       /* 16px - headings, emphasis */
---text-lg: 1.125rem;     /* 18px - section titles */
+// Warning - Amber
+text-amber-500      bg-amber-500/10     border-l-amber-500
 
-/* Font weights */
---font-normal: 400;
---font-medium: 500;
---font-semibold: 600;
+// Info/Processing - Blue
+text-blue-500       bg-blue-500/10      border-l-blue-500
 ```
 
-### 4.3 Spacing & Layout
+### 4.2 Typography (Tailwind)
 
-```css
-/* Container padding */
---space-chat-container: 1rem;            /* 16px */
---space-message-gap: 1rem;               /* 16px between messages */
---space-section-gap: 1.5rem;             /* 24px between sections */
+```tsx
+// Font family - using Tailwind defaults
+font-sans          // Inter, system stack
+font-mono          // JetBrains Mono, monospace (for code)
 
-/* Input area */
---input-min-height: 48px;
---input-max-height: 200px;
---input-border-radius: 12px;
+// Font sizes
+text-xs            // 12px - timestamps, metadata
+text-sm            // 14px - body text, messages  
+text-base          // 16px - headings, emphasis
+text-lg            // 18px - section titles
 
-/* Message bubbles */
---bubble-padding-x: 1rem;
---bubble-padding-y: 0.75rem;
---bubble-border-radius: 16px;
---bubble-max-width: 85%;
+// Font weights
+font-normal        // 400
+font-medium        // 500
+font-semibold      // 600
+```
+
+### 4.3 Layout Expansion (Tailwind Classes)
+
+```tsx
+// Playground Section - EXPANDED
+// Before: h-[600px] min-h-[600px]
+// After:
+className="min-h-[700px] max-h-[calc(100vh-200px)]"
+
+// Chat Panel - WIDER  
+// Before: basis-1/3 (33%)
+// After:
+className="w-[45%] min-w-[400px] max-w-[600px]"
+// or simplified:
+className="basis-[45%]"
+
+// Editor Panel
+// Before: basis-2/3 (67%)
+// After:
+className="flex-1" // Takes remaining space (~55%)
+```
+
+### 4.4 Spacing & Component Classes
+
+```tsx
+// Chat Container
+className="p-5 rounded-2xl"  // 20px padding, 16px radius
+
+// Message bubbles - Copilot style
+// User message:
+className="px-4 py-3 rounded-xl rounded-br-sm max-w-[88%] bg-zinc-800"
+
+// Assistant message (no background):
+className="max-w-[88%]"
+
+// Input area
+className="min-h-[52px] max-h-[180px] rounded-xl p-3.5"
+```
+
+### 4.5 Complete Component Class Examples
+
+#### Chat Container
+```tsx
+<div className="h-full w-full flex flex-col bg-[#0D1117] rounded-2xl border border-white/10 overflow-hidden">
+```
+
+#### Chat Header
+```tsx
+<header className="flex items-center justify-between px-4 py-3 bg-[#151B23] border-b border-white/5">
+  <div className="flex items-center gap-2">
+    <SparkleIcon className="w-5 h-5 text-blue-500" />
+    <span className="font-medium text-slate-50">Regex Copilot</span>
+  </div>
+  <div className="flex items-center gap-2 text-sm text-slate-400">
+    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+    <span>Ready</span>
+  </div>
+</header>
+```
+
+#### User Message Bubble
+```tsx
+<div className="flex justify-end">
+  <div className="px-4 py-3 rounded-xl rounded-br-sm bg-zinc-800 text-slate-50 max-w-[88%]">
+    {message}
+  </div>
+</div>
+```
+
+#### Assistant Message
+```tsx
+<div className="flex gap-3">
+  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
+    <SparkleIcon className="w-3.5 h-3.5 text-white" />
+  </div>
+  <div className="text-slate-50 space-y-3">
+    {content}
+  </div>
+</div>
+```
+
+#### Compact Tool Status (Processing)
+```tsx
+<div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border-l-2 border-l-blue-500 text-sm">
+  <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+  <span className="text-slate-300">Generating pattern...</span>
+  <span className="ml-auto text-slate-500 text-xs">3.2s</span>
+</div>
+```
+
+#### Compact Tool Status (Success)
+```tsx
+<div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-500/10 border-l-2 border-l-green-500 text-sm">
+  <Check className="w-4 h-4 text-green-500" />
+  <span className="text-slate-300">Generated • 5/5 tests passed</span>
+</div>
+```
+
+#### Compact Tool Status (Error - Collapsed)
+```tsx
+<div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border-l-2 border-l-red-500 text-sm">
+  <X className="w-4 h-4 text-red-500" />
+  <span className="text-slate-300">Failed • 2 tests didn't match</span>
+  <button className="ml-auto text-slate-400 text-xs hover:text-slate-200">
+    Show Details
+  </button>
+</div>
+```
+
+#### Chat Input
+```tsx
+<div className="p-4 bg-[#151B23] border-t border-white/5">
+  <div className="relative">
+    <textarea
+      className="w-full min-h-[52px] max-h-[180px] px-4 py-3 pr-12 
+                 bg-[#1C232D] text-slate-50 placeholder:text-slate-500
+                 rounded-xl border border-white/10 
+                 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50
+                 resize-none outline-none transition-colors"
+      placeholder="Describe what you want to match..."
+    />
+    <button className="absolute right-3 bottom-3 w-8 h-8 rounded-full 
+                       bg-gradient-to-r from-blue-500 to-violet-500 
+                       flex items-center justify-center
+                       disabled:opacity-30 disabled:bg-none disabled:bg-zinc-600
+                       transition-all hover:opacity-90">
+      <ArrowUp className="w-4 h-4 text-white" />
+    </button>
+  </div>
+</div>
+```
+
+#### Empty State
+```tsx
+<div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 
+                  flex items-center justify-center mb-6">
+    <SparkleIcon className="w-6 h-6 text-white" />
+  </div>
+  <h2 className="text-lg font-medium text-slate-50 mb-2">
+    Hi! I'm Regex Copilot.
+  </h2>
+  <p className="text-slate-400 mb-8 max-w-xs">
+    Tell me what you want to match, and I'll generate the perfect pattern for you.
+  </p>
+  <div className="space-y-2 w-full max-w-sm">
+    {suggestions.map((s) => (
+      <button 
+        key={s}
+        className="w-full px-4 py-3 text-left text-sm text-slate-300
+                   bg-[#1C232D] rounded-lg border border-white/5
+                   hover:bg-[#232B37] hover:border-blue-500/30 
+                   transition-colors"
+      >
+        "{s}"
+      </button>
+    ))}
+  </div>
+</div>
 ```
 
 ---
 
 ## 5. Component Specifications
 
-### 5.1 Chat Header
+### 5.1 Playground Layout (EXPANDED)
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  ╭────╮                                                         │
-│  │ ✧  │  Regex Copilot          • Ready            ⚙️  🗑️      │
-│  ╰────╯                                                         │
-└─────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────────────┐
+│                              Regex Playground (min-h: 700px)                       │
+│                                                                                    │
+│  ┌─────────────────────────────────┐   │   ┌─────────────────────────────────────┐│
+│  │         CHAT PANEL (45%)        │   │   │        EDITOR PANEL (55%)          ││
+│  │                                 │   │   │                                     ││
+│  │  ╭────────────────────────────╮ │   │   │   Regex Pattern                    ││
+│  │  │     Regex Copilot    • ●   │ │   │   │   ┌───────────────────────────────┐││
+│  │  ╰────────────────────────────╯ │   │   │   │  /^\+61\d{9,10}$/            │││
+│  │                                 │   │   │   └───────────────────────────────┘││
+│  │  ┌────────────────────────────┐ │   │   │                                     ││
+│  │  │ User message...            │ │   │   │   Test String                      ││
+│  │  └────────────────────────────┘ │   │   │   ┌───────────────────────────────┐││
+│  │                                 │   │   │   │  +61412345678                 │││
+│  │  ┌────────────────────────────┐ │   │   │   └───────────────────────────────┘││
+│  │  │ ✧ Assistant response...   │ │   │   │                                     ││
+│  │  │   [Compact tool status]   │ │   │   │   ✓ Match found                    ││
+│  │  └────────────────────────────┘ │   │   │                                     ││
+│  │                                 │   │   │                                     ││
+│  │  ┌────────────────────────────┐ │   │   │                                     ││
+│  │  │ Describe what to match... │ │   │   │                                     ││
+│  │  └────────────────────────────┘ │   │   │                                     ││
+│  │                                 │   │   │                                     ││
+│  └─────────────────────────────────┘   │   └─────────────────────────────────────┘│
+│                                        │                                          │
+└────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Layout Changes:**
+- Section min-height: `700px` (was `600px`)
+- Chat panel: `45%` width (was `33%`)
+- Editor panel: `55%` width (was `67%`)
+- More padding around all elements
+- Gradient divider between panels
+
+### 5.2 Chat Header (Copilot Style)
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│  ✧  Regex Copilot                               ●  Ready      ⚙️  │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
 **Specifications:**
-- **Logo:** 32x32px gradient icon with sparkle/brain motif
-- **Title:** "Regex Copilot" in `--text-primary`, `font-semibold`
-- **Status indicator:** Pulsing dot with status text
-  - 🟢 Ready (green pulse)
-  - 🔵 Thinking (blue pulse + animation)
-  - 🟡 Awaiting input (amber static)
-  - 🔴 Error (red static)
-- **Actions:** Ghost buttons, 32px touch target
+- **Background:** `--copilot-bg-secondary`
+- **Logo:** 24px Copilot sparkle icon with subtle gradient
+- **Title:** "Regex Copilot" - `--copilot-text-primary`, `font-medium`
+- **Status:** Compact inline with pulsing dot
+  - 🟢 Ready - Green dot
+  - 🔵 Thinking - Blue pulse animation
+  - ⚡ Processing - Amber static
+- **Actions:** Minimal, ghost icons only
+- **Height:** 48px fixed, slim and non-intrusive
 
-### 5.2 Empty State
+### 5.3 Message Bubbles (Copilot Style)
+
+#### User Message
+```
+                                         ┌──────────────────────────────┐
+                                         │ Match phone numbers starting │
+                                         │ with +61 country code        │
+                                         └──────────────────────────────┘
+```
+
+**Specifications:**
+- **Alignment:** Right-aligned, NO avatar (cleaner)
+- **Background:** `--copilot-bg-tertiary` with subtle gradient border
+- **Text:** `--copilot-text-primary`
+- **Border radius:** `12px 12px 2px 12px` (notched bottom-right)
+- **Padding:** `12px 16px`
+- **Max-width:** `88%`
+
+#### Assistant Message
+```
+  ✧
+  ┌───────────────────────────────────────────────────────────────────┐
+  │ I'll help you match Australian phone numbers.                     │
+  │                                                                   │
+  │ Here's the pattern:                                               │
+  │                                                                   │
+  │  ┌─────────────────────────────────────────────────────────────┐  │
+  │  │ ^\+61\d{9,10}$                                         📋  │  │
+  │  └─────────────────────────────────────────────────────────────┘  │
+  └───────────────────────────────────────────────────────────────────┘
+```
+
+**Specifications:**
+- **Alignment:** Left-aligned with Copilot sparkle icon
+- **Icon:** 20px sparkle, gradient fill (blue → violet)
+- **Background:** Transparent (no bubble background)
+- **Text:** `--copilot-text-primary`
+- **Code blocks:** `--copilot-bg-secondary` with accent border-left
+- **No bubble border** - Copilot style is clean/minimal
+
+### 5.4 Tool/Subagent Status (COMPACT - Keep Current Approach)
+
+#### Inline Processing State
+```
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  ⟳ Generating pattern...                                3.2s   │
+  └─────────────────────────────────────────────────────────────────┘
+```
+
+**Specifications:**
+- **Style:** Single-line, inline with message flow
+- **Background:** `--copilot-info-bg` (subtle blue tint)
+- **Border-left:** 2px `--copilot-info`
+- **Icon:** Small spinner, 16px
+- **Timer:** Right-aligned, `--copilot-text-tertiary`
+- **Height:** ~36px maximum
+
+#### Subagent Status (Keep Current Design)
+```
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  ⟳ Code Agent                                                   │
+  │  └── Testing regex against examples                      2.1s   │
+  └─────────────────────────────────────────────────────────────────┘
+```
+
+**Specifications:**
+- **Collapsible** by default after completion
+- **Tree structure** for nested operations
+- **Compact spacing** - no excessive padding
+- **Auto-collapse** success states after 2s
+
+#### Compact Success State
+```
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  ✓ Generated • 5/5 tests passed                                 │
+  └─────────────────────────────────────────────────────────────────┘
+```
+
+#### Compact Error State
+```
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  ✕ Failed • 2 tests didn't match          [Show Details]       │
+  └─────────────────────────────────────────────────────────────────┘
+```
+
+**Error Details (expandable):**
+```
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  ✕ Failed • 2 tests didn't match                    [Hide ▲]   │
+  │  ─────────────────────────────────────────────────────────────  │
+  │  • "+611234" matched but shouldn't                              │
+  │  • "0412345678" didn't match but should                        │
+  │                                                                 │
+  │  💡 Try adding more specific examples                           │
+  └─────────────────────────────────────────────────────────────────┘
+```
+
+### 5.5 Chat Input (Copilot Style)
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                                                                 │
-│                        ╭──────────────╮                         │
-│                        │      ✧       │                         │
-│                        │   COPILOT    │                         │
-│                        ╰──────────────╯                         │
-│                                                                 │
-│                    Hi! I'm your Regex Copilot.                  │
-│                                                                 │
-│           Describe what you want to match, and I'll             │
-│           generate the perfect regular expression.              │
-│                                                                 │
-│        ┌─────────────────────────────────────────────┐          │
-│        │  💡 "Match email addresses ending in .edu"  │          │
-│        └─────────────────────────────────────────────┘          │
-│                                                                 │
-│        ┌─────────────────────────────────────────────┐          │
-│        │  💡 "Extract phone numbers from text"       │          │
-│        └─────────────────────────────────────────────┘          │
-│                                                                 │
-│        ┌─────────────────────────────────────────────┐          │
-│        │  💡 "Validate URLs with optional protocol"  │          │
-│        └─────────────────────────────────────────────┘          │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │ Describe what you want to match...                         ⬆  │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
 ```
+
+**Specifications:**
+- **Container:** `--copilot-bg-primary` background
+- **Input field:**
+  - Background: `--copilot-bg-secondary`
+  - Border: `--copilot-border-default`
+  - Focus: `--copilot-accent` border glow
+  - Placeholder: `--copilot-text-tertiary`
+  - Border-radius: 12px
+- **Send button:**
+  - Inside input, right-aligned
+  - Gradient background when enabled
+  - `--copilot-text-tertiary` when disabled
+  - 32px circular
+- **No keyboard hint text** - cleaner look
+
+### 5.6 Empty State
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                              ✧                                      │
+│                                                                     │
+│                    Hi! I'm Regex Copilot.                          │
+│                                                                     │
+│            Tell me what you want to match, and I'll                │
+│            generate the perfect pattern for you.                   │
+│                                                                     │
+│        ┌───────────────────────────────────────────────┐           │
+│        │  "Match emails ending in .edu"               │           │
+│        └───────────────────────────────────────────────┘           │
+│                                                                     │
+│        ┌───────────────────────────────────────────────┐           │
+│        │  "Extract phone numbers from text"           │           │
+│        └───────────────────────────────────────────────┘           │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Specifications:**
+- **Icon:** 48px Copilot sparkle, gradient
+- **Headline:** `--copilot-text-primary`, `font-medium`, 18px
+- **Subtext:** `--copilot-text-secondary`, 14px
+- **Suggestions:** 
+  - Background: `--copilot-bg-secondary`
+  - Border: `--copilot-border-subtle`
+  - Hover: `--copilot-bg-hover` + border accent
+  - Click to populate input
 
 **Specifications:**
 - **Logo:** 64x64px animated gradient icon
@@ -503,57 +813,187 @@ Action: "Copy to clipboard"
 
 ## 10. Implementation Phases
 
-### Phase 1: Foundation
-- [ ] Update CSS variables with new color palette
-- [ ] Create shared component library (buttons, inputs, cards)
-- [ ] Implement new typography system
+### Phase 1: Dark Mode Foundation & Layout Expansion
+**Goal:** Set up the dark Copilot aesthetic and expand the playground layout
 
-### Phase 2: Components
-- [ ] Redesign ChatHeader with status indicator
-- [ ] Build new EmptyState with suggestions
-- [ ] Update MessageRow styling
-- [ ] Enhance ToolInvocationCard states
+**Files to modify:**
+- `src/components/RegexPlaygroundSection.tsx` - Expand layout
+- `src/components/PlaygroundChat.tsx` - Dark container styles
+- `src/app/globals.css` - (optional) Add custom colors if needed
 
-### Phase 3: Integration
-- [ ] Migrate RegexGeneratorForm to conversational UI
-- [ ] Implement streaming message display
-- [ ] Add keyboard shortcuts
-- [ ] Connect to new agent app backend
+**Tasks:**
+- [ ] Update `RegexPlaygroundSection` layout:
+  - Increase min-height from `600px` to `700px`
+  - Change chat panel from `basis-1/3` to `basis-[45%]`
+  - Change editor panel from `basis-2/3` to `flex-1`
+  - Update section background to dark
+- [ ] Update `PlaygroundChat` container:
+  - Change bg from `bg-white dark:bg-neutral-950` to `bg-[#0D1117]`
+  - Update border to `border-white/10`
+  - Add `rounded-2xl` for softer corners
+- [ ] Force dark mode on playground section (or respect system preference)
 
-### Phase 4: Polish
-- [ ] Add animations and transitions
-- [ ] Implement responsive layouts
-- [ ] Accessibility audit
-- [ ] User testing and iteration
+**Estimated time:** 1-2 hours
 
 ---
 
-## 11. Files to Modify
+### Phase 2: Copilot-Style Chat Components
+**Goal:** Redesign message bubbles, header, and input to match Copilot aesthetic
+
+**Files to modify:**
+- `src/app/new-agent-app/components/chat-header.tsx`
+- `src/app/new-agent-app/components/chat-input.tsx`
+- `src/app/new-agent-app/components/empty-state.tsx`
+- `src/app/new-agent-app/components/message-list.tsx`
+- `src/components/chat/message-row.tsx`
+
+**Tasks:**
+- [ ] **Chat Header:**
+  - Slim design (48px height)
+  - Copilot sparkle icon with gradient
+  - Inline status dot (green pulse for ready)
+  - Dark background `bg-[#151B23]`
+- [ ] **Message Bubbles:**
+  - User: Right-aligned, `bg-zinc-800`, rounded with notched corner
+  - Assistant: Left-aligned, no background, sparkle icon
+  - Remove avatars for cleaner look (or keep sparkle only)
+- [ ] **Chat Input:**
+  - Dark input field `bg-[#1C232D]`
+  - Gradient send button inside input
+  - Focus ring with blue accent
+  - Remove keyboard hints for cleaner look
+- [ ] **Empty State:**
+  - Centered Copilot sparkle icon
+  - Updated copy: "Hi! I'm Regex Copilot."
+  - Suggestion buttons with hover effects
+
+**Estimated time:** 3-4 hours
+
+---
+
+### Phase 3: Compact Tool/Subagent Status
+**Goal:** Keep tool status compact and non-intrusive (current approach is good)
+
+**Files to modify:**
+- `src/components/chat/tool-invocation-card.tsx`
+
+**Tasks:**
+- [ ] **Processing state:**
+  - Single-line inline status
+  - Blue left border, subtle blue background
+  - Small spinner + text + timer
+  - Max height ~36px
+- [ ] **Success state:**
+  - Collapsed to single line: "✓ Generated • 5/5 tests passed"
+  - Auto-collapse after 2 seconds
+- [ ] **Error state:**
+  - Collapsed: "✕ Failed • 2 tests didn't match [Show Details]"
+  - Expandable to show specifics
+- [ ] **Subagent status:**
+  - Keep tree structure for nested operations
+  - Compact spacing, subtle colors
+  - Collapsible after completion
+
+**Estimated time:** 2-3 hours
+
+---
+
+### Phase 4: Polish & Animations
+**Goal:** Add final polish, animations, and ensure consistency
+
+**Files to modify:**
+- Various component files
+- `src/app/globals.css` (for animations)
+
+**Tasks:**
+- [ ] **Animations:**
+  - Message entrance (fade + slide up)
+  - Status dot pulse animation
+  - Tool card expand/collapse
+  - Button hover transitions
+- [ ] **Transitions:**
+  - Smooth color transitions on hover
+  - Input focus ring animation
+- [ ] **Code blocks:**
+  - Dark background with blue left accent
+  - Copy button styling
+  - Syntax highlighting (if using)
+- [ ] **Accessibility:**
+  - Ensure color contrast meets WCAG AA
+  - Focus states visible
+  - Screen reader labels
+- [ ] **Testing:**
+  - Test in both light/dark system preferences
+  - Test responsiveness
+  - Test with various message lengths
+
+**Estimated time:** 2-3 hours
+
+---
+
+## 11. Files to Modify (Summary)
 
 ```
 src/
 ├── app/
-│   ├── globals.css                    # Add new CSS variables
+│   ├── globals.css                    # Add animations (optional)
 │   └── new-agent-app/
-│       ├── components/
-│       │   ├── chat-header.tsx        # Status indicator, new styling
-│       │   ├── chat-input.tsx         # New design, keyboard hints
-│       │   ├── empty-state.tsx        # Suggestions, new copy
-│       │   └── message-list.tsx       # Spacing, animations
-│       └── chat.tsx                   # Layout adjustments
+│       └── components/
+│           ├── chat-header.tsx        # Phase 2: Copilot style header
+│           ├── chat-input.tsx         # Phase 2: Dark input, gradient button
+│           ├── empty-state.tsx        # Phase 2: New copy, suggestions
+│           └── message-list.tsx       # Phase 2: Spacing adjustments
 ├── components/
-│   ├── RegexPlaygroundSection.tsx     # Replace form with chat
-│   ├── RegexGeneratorForm.tsx         # Deprecate or repurpose
+│   ├── RegexPlaygroundSection.tsx     # Phase 1: Expand layout, dark mode
+│   ├── PlaygroundChat.tsx             # Phase 1: Dark container
 │   └── chat/
-│       ├── message-row.tsx            # New bubble styling
-│       └── tool-invocation-card.tsx   # State-specific designs
-└── lib/
-    └── design-tokens.ts               # Export CSS vars as TS constants
+│       ├── message-row.tsx            # Phase 2: Copilot bubble styling
+│       └── tool-invocation-card.tsx   # Phase 3: Compact status cards
 ```
 
 ---
 
-## 12. Success Metrics
+## 12. Quick Reference: Tailwind Classes
+
+### Backgrounds
+| Element | Class |
+|---------|-------|
+| Playground section | `bg-[#08090D]` |
+| Chat container | `bg-[#0D1117]` |
+| Header/Input area | `bg-[#151B23]` |
+| Message bubbles | `bg-[#1C232D]` or `bg-zinc-800` |
+| Hover states | `bg-[#232B37]` |
+| Tool status (info) | `bg-blue-500/10` |
+| Tool status (success) | `bg-green-500/10` |
+| Tool status (error) | `bg-red-500/10` |
+
+### Text
+| Element | Class |
+|---------|-------|
+| Primary text | `text-slate-50` |
+| Secondary text | `text-slate-400` |
+| Muted text | `text-slate-500` |
+| Disabled | `text-slate-600` |
+
+### Borders
+| Element | Class |
+|---------|-------|
+| Subtle | `border-white/5` |
+| Default | `border-white/10` |
+| Emphasis | `border-white/20` |
+| Accent | `border-blue-500` |
+
+### Accents & Gradients
+| Element | Class |
+|---------|-------|
+| Copilot gradient | `bg-gradient-to-r from-blue-500 to-violet-500` |
+| Blue accent | `text-blue-500` |
+| Success | `text-green-500` |
+| Error | `text-red-500` |
+
+---
+
+## 13. Success Metrics
 
 - **User engagement:** Time spent in chat ↑ 20%
 - **Task completion:** Successful regex generations ↑ 15%
@@ -563,45 +1003,50 @@ src/
 
 ---
 
-## Appendix A: Figma/Design Mockups
-
-*To be added: Link to Figma file with visual mockups*
-
-## Appendix B: Animation Specifications
+## Appendix A: Animation Classes (Tailwind)
 
 ### Thinking Pulse
-```css
-@keyframes thinking-pulse {
+```tsx
+// Add to tailwind.config.ts or use inline
+className="animate-pulse"
+
+// Or custom:
+// In globals.css:
+@keyframes copilot-pulse {
   0%, 100% { opacity: 0.4; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.1); }
 }
-.thinking-indicator {
-  animation: thinking-pulse 1.5s ease-in-out infinite;
-}
+
+// In component:
+className="animate-[copilot-pulse_1.5s_ease-in-out_infinite]"
 ```
 
 ### Message Entrance
-```css
+```tsx
+// In globals.css:
 @keyframes message-enter {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.message {
-  animation: message-enter 0.2s ease-out;
-}
+
+// In component:
+className="animate-[message-enter_0.2s_ease-out]"
 ```
 
-### Tool Card Expand
-```css
-@keyframes expand {
-  from { max-height: 0; opacity: 0; }
-  to { max-height: 500px; opacity: 1; }
-}
-.tool-card {
-  animation: expand 0.3s ease-out;
-}
+### Spinner
+```tsx
+// Built-in Tailwind
+className="animate-spin"
+```
+
+### Transitions
+```tsx
+// Smooth color/opacity transitions
+className="transition-colors duration-150"
+className="transition-all duration-200"
+className="transition-opacity duration-300"
 ```
 
 ---
 
-*Last updated: 2026-01-04*
+*Last updated: 2026-01-05*
