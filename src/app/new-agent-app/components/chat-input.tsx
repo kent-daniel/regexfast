@@ -49,49 +49,43 @@ export function ChatInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-4 bg-white absolute bottom-0 left-0 right-0 z-10 dark:bg-neutral-950"
+      className="p-3 bg-[#151B23] border-t border-white/10 flex-shrink-0"
     >
-      <div className="flex items-center gap-2">
-        <div className="flex-1 relative">
-          <Textarea
-            disabled={isDisabled}
-            placeholder={
-              isDisabled
-                ? "Please respond to the tool confirmation above..."
-                : "Send a message..."
-            }
-            className="flex w-full border border-neutral-200 dark:border-neutral-700 px-3 py-2 ring-offset-background placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300 dark:focus-visible:ring-neutral-700 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl text-base! pb-10 dark:bg-neutral-900"
-            value={value}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            rows={2}
-            style={{ height: textareaHeight }}
-          />
-          <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
-            {isStreaming ? (
-              <button
-                type="button"
-                onClick={onStop}
-                className="inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-1.5 h-fit border border-neutral-200 dark:border-neutral-800"
-                aria-label={
-                  activeToolCalls.length > 0
-                    ? `Stop generation (tools: ${activeToolCalls.join(", ")})`
-                    : "Stop generation"
-                }
-              >
-                <StopIcon size={16} />
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-1.5 h-fit border border-neutral-200 dark:border-neutral-800"
-                disabled={isDisabled || !value.trim()}
-                aria-label="Send message"
-              >
-                <PaperPlaneTiltIcon size={16} />
-              </button>
-            )}
-          </div>
+      <div className="relative">
+        <Textarea
+          disabled={isDisabled}
+          placeholder={
+            isDisabled
+              ? "Please respond to the tool confirmation above..."
+              : "Describe what you want to match..."
+          }
+          className="w-full border border-white/10 bg-[#1C232D] text-slate-100 text-[13px] px-3.5 py-2.5 pr-10 rounded-lg placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 disabled:cursor-not-allowed disabled:opacity-50 min-h-[40px] max-h-[120px] overflow-hidden resize-none"
+          value={value}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          rows={1}
+          style={{ height: textareaHeight }}
+        />
+        <div className="absolute right-2.5 bottom-2">
+          {isStreaming ? (
+            <button
+              type="button"
+              onClick={onStop}
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-red-500 hover:bg-red-600 transition-colors"
+              aria-label="Stop generation"
+            >
+              <StopIcon size={14} className="text-white" />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-violet-500 hover:opacity-90 disabled:opacity-30 disabled:bg-none disabled:bg-zinc-600 transition-all"
+              disabled={isDisabled || !value.trim()}
+              aria-label="Send message"
+            >
+              <PaperPlaneTiltIcon size={14} className="text-white" />
+            </button>
+          )}
         </div>
       </div>
     </form>

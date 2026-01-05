@@ -62,7 +62,7 @@ export function PlaygroundChat() {
   const rows = computeRows();
 
   return (
-    <div className="h-full w-full flex flex-col bg-white dark:bg-neutral-950 rounded-lg border border-neutral-200 dark:border-neutral-800 overflow-hidden relative">
+    <div className="h-full max-h-full w-full flex flex-col bg-[#0D1117] rounded-2xl border border-white/10 overflow-hidden">
       <OpenAIKeyWarning />
       
       <ChatHeader

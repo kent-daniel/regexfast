@@ -42,37 +42,25 @@ export function MessageRow({
   return (
     <div>
       {showDebug && model.message && (
-        <pre className="text-xs text-neutral-500 overflow-scroll bg-neutral-100 dark:bg-neutral-800 p-2 rounded mb-2">
+        <pre className="text-[11px] text-slate-500 overflow-scroll bg-[#1C232D] p-2 rounded mb-2">
           {JSON.stringify(model.message, null, 2)}
         </pre>
       )}
 
       <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
         <div
-          className={`flex gap-3 max-w-[90%] ${isUser ? "flex-row-reverse" : "flex-row"}`}
+          className={`flex gap-3 max-w-[92%] ${isUser ? "flex-row-reverse" : "flex-row"}`}
         >
-          {model.showAvatar ? (
-            <div className="flex items-center gap-2">
-              <div
-                className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${
-                  isUser
-                    ? "bg-neutral-200 dark:bg-neutral-700"
-                    : "bg-gradient-to-br from-purple-500 to-purple-600"
-                }`}
-              >
-                {isUser ? (
-                  <UserIcon
-                    size={14}
-                    className="text-neutral-600 dark:text-neutral-300"
-                  />
-                ) : (
-                  <SparkleIcon size={14} className="text-white" weight="fill" />
-                )}
+          {/* Only show avatar for assistant, not for user (cleaner Copilot style) */}
+          {!isUser && model.showAvatar ? (
+            <div className="flex-shrink-0">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
+                <SparkleIcon size={10} className="text-white" weight="fill" />
               </div>
             </div>
-          ) : (
-            <div className="w-7" />
-          )}
+          ) : !isUser ? (
+            <div className="w-5" />
+          ) : null}
 
           <div className="flex-1 min-w-0">
             <div>
@@ -82,14 +70,14 @@ export function MessageRow({
                     // biome-ignore lint/suspicious/noArrayIndexKey: immutable index
                     <div
                       key={i}
-                      className={`${
+                      className={`text-[13px] leading-relaxed ${
                         isUser
-                          ? "bg-purple-500 text-white rounded-2xl rounded-br-md px-4 py-2"
-                          : ""
+                          ? "bg-[#1C232D] text-slate-100 rounded-xl rounded-br-sm px-4 py-2.5"
+                          : "text-slate-200"
                       }`}
                     >
                       {part.text.startsWith("scheduled message") && (
-                        <span className="text-xs text-purple-400 mb-1 block">
+                        <span className="text-[11px] text-blue-400 mb-1 block">
                           🕒 Scheduled
                         </span>
                       )}
@@ -157,7 +145,7 @@ export function MessageRow({
               })}
 
               {model.showThinkingTail && (
-                <div className="flex items-center text-sm text-neutral-500 dark:text-neutral-400 animate-pulse">
+                <div className="flex items-center text-[13px] text-slate-400 animate-pulse">
                   Thinking…
                 </div>
               )}
