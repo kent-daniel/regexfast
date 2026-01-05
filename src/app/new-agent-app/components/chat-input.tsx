@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUpIcon, StopIcon } from "@phosphor-icons/react";
+import { ArrowUpIcon, StopIcon, WarningCircle } from "@phosphor-icons/react";
 
 type ChatInputProps = {
   value: string;
@@ -11,6 +11,7 @@ type ChatInputProps = {
   onStop: () => void;
   isStreaming: boolean;
   isDisabled: boolean;
+  isLimitReached?: boolean;
   activeToolCalls?: string[];
 };
 
@@ -21,12 +22,14 @@ export function ChatInput({
   onStop,
   isStreaming,
   isDisabled,
+  isLimitReached = false,
   activeToolCalls = []
 }: ChatInputProps) {
   const [textareaHeight, setTextareaHeight] = useState("auto");
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    if (isLimitReached) return;
     onSubmit(e);
     setTextareaHeight("auto");
   };
@@ -46,7 +49,22 @@ export function ChatInput({
     setTextareaHeight(`${e.target.scrollHeight}px`);
   };
 
-  const canSubmit = !isDisabled && value.trim().length > 0;
+  const canSubmit = !isDisabled && !isLimitReached && value.trim().length > 0;
+
+  // Show limit reached banner
+  if (isLimitReached) {
+    return (
+      <div className="p-4 bg-[#151B23] border-t border-white/5 flex-shrink-0">
+        <div className="flex items-center gap-3 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+          <WarningCircle size={20} className="text-red-400 flex-shrink-0" weight="fill" />
+          <div className="flex-1">
+            <p className="text-sm text-red-300 font-medium">Token limit reached</p>
+            <p className="text-xs text-red-400/80">Clear the chat to start a new session.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form

@@ -13,6 +13,8 @@ import {
   OpenAIKeyWarning
 } from "./components";
 
+import { TOKEN_LIMIT } from "@/agent-worker/shared";
+
 export default function Chat() {
   const [showDebug, setShowDebug] = useState(false);
   const [agentInput, setAgentInput] = useState("");
@@ -33,6 +35,10 @@ export default function Chat() {
     computeRows
   } = useChatSession();
 
+  // Check if token limit is reached
+  const totalTokens = agentState?.tokenUsage?.totalTokens ?? 0;
+  const isLimitReached = totalTokens >= TOKEN_LIMIT;
+
   // Force dark mode for chat
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -51,7 +57,7 @@ export default function Chat() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!agentInput.trim()) return;
+    if (!agentInput.trim() || isLimitReached) return;
 
     const message = agentInput;
     setAgentInput("");
@@ -102,7 +108,8 @@ export default function Chat() {
           onSubmit={handleSubmit}
           onStop={handleStop}
           isStreaming={isStreaming}
-          isDisabled={pendingToolCallConfirmation}
+          isDisabled={pendingToolCallConfirmation || isLimitReached}
+          isLimitReached={isLimitReached}
           activeToolCalls={activeToolCalls}
         />
       </div>

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { BugIcon, TrashIcon, SparkleIcon } from "@phosphor-icons/react";
+import { TOKEN_LIMIT } from "@/agent-worker/shared";
 
 type ChatHeaderProps = {
   totalTokens?: number;
@@ -10,6 +11,42 @@ type ChatHeaderProps = {
   onClearHistory: () => void;
   isStreaming?: boolean;
 };
+
+function TokenProgressBar({ totalTokens }: { totalTokens: number }) {
+  const percentUsed = Math.min((totalTokens / TOKEN_LIMIT) * 100, 100);
+  const percentRemaining = 100 - percentUsed;
+  
+  // Color based on remaining percentage
+  let barColor = "bg-green-500";
+  if (percentRemaining <= 25) {
+    barColor = "bg-red-500";
+  } else if (percentRemaining <= 50) {
+    barColor = "bg-yellow-500";
+  }
+
+  const isLimitReached = totalTokens >= TOKEN_LIMIT;
+
+  return (
+    <div 
+      className="flex items-center gap-2 cursor-default"
+      title={`${totalTokens.toLocaleString()} / ${TOKEN_LIMIT.toLocaleString()} tokens used`}
+    >
+      <span className="text-[11px] text-slate-400 font-mono whitespace-nowrap">
+        {isLimitReached ? (
+          <span className="text-red-400">Limit reached</span>
+        ) : (
+          <>Tokens: {Math.round(percentRemaining)}%</>
+        )}
+      </span>
+      <div className="w-16 h-1.5 bg-zinc-700 rounded-full overflow-hidden">
+        <div 
+          className={`h-full ${barColor} transition-all duration-300`}
+          style={{ width: `${percentRemaining}%` }}
+        />
+      </div>
+    </div>
+  );
+}
 
 export function ChatHeader({
   totalTokens,
@@ -27,12 +64,10 @@ export function ChatHeader({
 
       {/* Title */}
       <div className="flex-1">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <h2 className="font-medium text-sm text-slate-50">Regex Copilot</h2>
           {totalTokens !== undefined && (
-            <span className="text-[11px] text-slate-500 font-mono">
-              {totalTokens.toLocaleString()} tokens
-            </span>
+            <TokenProgressBar totalTokens={totalTokens} />
           )}
         </div>
       </div>
