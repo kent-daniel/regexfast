@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAgent } from "agents/react";
 import { isStaticToolUIPart } from "ai";
 import { useAgentChat } from "agents/ai-react";
@@ -19,13 +19,33 @@ type ChatState = {
   };
 };
 
+// Auto-detect Worker URL based on hostname
+function getWorkerHost(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  
+  const hostname = window.location.hostname;
+  
+  // Preview deployments on pages.dev
+  if (hostname.endsWith(".regexfast.pages.dev")) {
+    return "https://agent-worker-do-preview.outwork.workers.dev";
+  }
+  // Production domain
+  if (hostname === "magicregexgenerator.xyz" || hostname === "www.magicregexgenerator.xyz") {
+    return "https://agent-worker-do.outwork.workers.dev";
+  }
+  // localhost - use same origin (Next.js rewrites handle it)
+  return undefined;
+}
+
 export function useChatSession() {
+  // Auto-detect worker URL based on current hostname
+  const workerHost = useMemo(() => getWorkerHost(), []);
+
   // Generate a unique session ID per browser tab
   const [sessionId, setSessionId] = useState<string>("");
 
   useEffect(() => {
     const stored = sessionStorage.getItem("agent-session-id");
-    console.log(process.env.NEXT_PUBLIC_WORKER_URL);
     if (stored) {
       setSessionId(stored);
     } else {
@@ -40,9 +60,8 @@ export function useChatSession() {
   const agent = useAgent({
     agent: "chat",
     name: sessionId || "default",
-    // In production/preview, connect directly to the Worker URL
-    // In development, Next.js rewrites /agents/* to the Worker
-    host: process.env.NEXT_PUBLIC_WORKER_URL || undefined,
+    // Auto-detected based on hostname (pages.dev → preview worker, regexfast.com → prod worker)
+    host: workerHost,
     onStateUpdate: (state) => {
       setAgentState(state as ChatState);
     }
