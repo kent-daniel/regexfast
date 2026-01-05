@@ -20,8 +20,8 @@ export function ChatHeader({
 }: ChatHeaderProps) {
   return (
     <header className="px-4 py-3 border-b border-white/5 flex items-center gap-2.5 bg-[#151B23] flex-shrink-0 h-12">
-      {/* Copilot sparkle icon with gradient */}
-      <div className="flex items-center justify-center h-6 w-6 bg-gradient-to-br from-blue-500 to-violet-500 rounded-full shadow-sm shadow-blue-500/20">
+      {/* Copilot sparkle icon */}
+      <div className="flex items-center justify-center h-6 w-6 bg-blue-500 rounded-full shadow-sm">
         <SparkleIcon size={12} className="text-white" weight="fill" />
       </div>
 
@@ -38,15 +38,17 @@ export function ChatHeader({
       </div>
 
       {/* Status indicator */}
-      <div className="flex items-center gap-1.5 text-xs text-slate-400 mr-2">
+      <div className="flex items-center gap-1.5 text-xs text-slate-400 mr-2" role="status" aria-live="polite">
         <span 
-          className={`w-2 h-2 rounded-full ${
+          className={`w-2 h-2 rounded-full transition-colors duration-300 ${
             isStreaming 
               ? "bg-blue-500 animate-pulse" 
-              : "bg-green-500 animate-[pulse_3s_ease-in-out_infinite]"
-          }`} 
+              : "bg-green-500 animate-[copilot-pulse_3s_ease-in-out_infinite]"
+          }`}
+          aria-hidden="true"
         />
         <span className="hidden sm:inline">{isStreaming ? "Thinking" : "Ready"}</span>
+        <span className="sr-only">{isStreaming ? "AI is thinking" : "AI is ready"}</span>
       </div>
 
       {/* Actions */}

@@ -51,10 +51,10 @@ export function MessageRow({
         <div
           className={`flex gap-3 max-w-[88%] ${isUser ? "flex-row-reverse" : "flex-row"}`}
         >
-          {/* Copilot sparkle avatar for assistant only - clean Copilot style */}
+          {/* Copilot sparkle avatar for assistant only */}
           {!isUser && model.showAvatar ? (
             <div className="flex-shrink-0 mt-0.5">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center shadow-sm shadow-blue-500/20">
+              <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center shadow-sm">
                 <SparkleIcon size={12} className="text-white" weight="fill" />
               </div>
             </div>
@@ -72,7 +72,7 @@ export function MessageRow({
                       key={i}
                       className={`text-sm leading-relaxed ${
                         isUser
-                          ? "bg-zinc-800 text-slate-50 rounded-xl rounded-br-sm px-4 py-3"
+                          ? "bg-zinc-800 text-slate-50 rounded-xl rounded-br-sm px-4 py-3 transition-colors duration-150 hover:bg-zinc-700/80"
                           : "text-slate-50"
                       }`}
                     >

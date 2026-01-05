@@ -203,7 +203,7 @@ export function ToolInvocationCard({
               </Button>
               <Button
                 size="sm"
-                className="h-7 px-3 text-xs bg-gradient-to-r from-blue-500 to-violet-500 hover:opacity-90 text-white border-0"
+                className="h-7 px-3 text-xs bg-blue-500 hover:bg-blue-600 text-white border-0"
                 onClick={() => handleApproval(true)}
               >
                 Approve
@@ -267,14 +267,14 @@ export function ToolInvocationCard({
           </div>
           
           {isExpanded && details?.length ? (
-            <div className="px-3 pb-3 pt-1 border-t border-red-500/20 space-y-1.5 animate-[message-enter_0.15s_ease-out]">
+            <div className="px-3 pb-3 pt-1 border-t border-red-500/20 space-y-1.5 animate-[expand_0.2s_ease-out]" role="region" aria-label="Error details">
               {details.map((detail, i) => (
                 <p key={`detail-${detail.slice(0, 20)}-${i}`} className="text-xs text-slate-400 pl-6">
-                  • {detail}
+                  <span aria-hidden="true">•</span> {detail}
                 </p>
               ))}
               <p className="text-xs text-slate-500 pl-6 pt-1 flex items-center gap-1">
-                <span className="text-amber-500">💡</span> Try adding more specific examples
+                <span aria-hidden="true">💡</span> Try adding more specific examples
               </p>
             </div>
           ) : null}

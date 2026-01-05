@@ -81,9 +81,9 @@ export function ChatInput({
           ) : (
             <button
               type="submit"
-              className={`flex items-center justify-center w-8 h-8 rounded-full transition-all shadow-sm ${
+              className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 shadow-sm ${
                 canSubmit
-                  ? "bg-blue-500 hover:bg-blue-600 hover:shadow-md hover:shadow-blue-500/20"
+                  ? "bg-blue-500 hover:bg-blue-600 hover:shadow-md active:scale-95"
                   : "bg-zinc-700 opacity-40 cursor-not-allowed"
               }`}
               disabled={!canSubmit}
