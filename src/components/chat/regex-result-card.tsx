@@ -186,7 +186,7 @@ function TestCaseRow({
         >
             {icon}
             <code className="text-slate-300 font-mono truncate flex-1">
-                "{displayInput}"
+                &quot;{displayInput}&quot;
             </code>
             {!detail.passed && mode === "match" && (
                 <span className="text-slate-500 text-[10px]">
