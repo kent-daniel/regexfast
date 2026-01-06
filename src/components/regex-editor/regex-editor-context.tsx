@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
 export type RegexEditorInitialData = {
   pattern: string;
@@ -36,12 +36,16 @@ export function RegexEditorProvider({ children }: { children: ReactNode }) {
     null
   );
 
+  const setLatestInitialData = useCallback((data: RegexEditorInitialData) => {
+    setLatestInitialDataState(data);
+  }, []);
+
   const value = useMemo<RegexEditorContextValue>(
     () => ({
       latestInitialData,
-      setLatestInitialData: (data) => setLatestInitialDataState(data),
+      setLatestInitialData,
     }),
-    [latestInitialData]
+    [latestInitialData, setLatestInitialData]
   );
 
   return <RegexEditorContext.Provider value={value}>{children}</RegexEditorContext.Provider>;

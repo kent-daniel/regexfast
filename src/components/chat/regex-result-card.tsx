@@ -47,7 +47,7 @@ export function RegexResultCard({
     testResults,
     example,
 }: RegexResultCardProps) {
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(true);
     const [copied, setCopied] = useState(false);
 
     const fullRegex = `/${pattern}/${flags}`;
@@ -188,16 +188,10 @@ function TestCaseRow({
             <code className="text-slate-300 font-mono truncate flex-1">
                 &quot;{displayInput}&quot;
             </code>
-            {!detail.passed && mode === "match" && (
-                <span className="text-slate-500 text-[10px]">
-                    expected {detail.expected}, got {detail.actual}
-                </span>
-            )}
-            {!detail.passed && mode === "capture" && (
-                <span className="text-slate-500 text-[10px] truncate max-w-[150px]">
-                    got {JSON.stringify(detail.actual)}
-                </span>
-            )}
+            
+            <span className="text-slate-500 text-[10px]">
+                expected {mode === "capture" ? JSON.stringify(detail.expected) : String(detail.expected)}, got {mode === "capture" ? JSON.stringify(detail.actual) : String(detail.actual)}
+            </span>
         </div>
     );
 }

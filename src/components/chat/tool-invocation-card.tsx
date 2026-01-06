@@ -235,11 +235,12 @@ export function ToolInvocationCard({
   const phaseLabel = getPhaseLabel(subagentPhase);
 
   // When a regex tool completes, publish its output for the editor panel.
+  const toolOutput = isCompleted && "output" in toolUIPart ? toolUIPart.output : null;
   useEffect(() => {
     if (!isRegex) return;
     if (!isCompleted) return;
-    if (!("output" in toolUIPart)) return;
-    const regexResult = getRegexResult(toolUIPart.output);
+    if (!toolOutput) return;
+    const regexResult = getRegexResult(toolOutput);
     if (!regexResult) return;
 
     setLatestInitialData({
@@ -248,7 +249,7 @@ export function ToolInvocationCard({
       runtime: regexResult.runtime,
       testResults: regexResult.testResults,
     });
-  }, [isRegex, isCompleted, toolUIPart, setLatestInitialData]);
+  }, [isRegex, isCompleted, toolOutput, setLatestInitialData]);
 
   // Approval Required State - Copilot style
   if (isApprovalRequested || needsApproval) {
