@@ -112,6 +112,19 @@ Provide example strings that should match and should NOT match. The tool will it
           agent.sandboxId = result.sandboxId;
         }
 
+        // Build test results summary for UI (not sent to AI context)
+        const testResultsSummary = result.testResults ? {
+          passed: result.testResults.passedCount,
+          failed: result.testResults.failedCount,
+          total: result.testResults.total,
+          details: result.testResults.results.map(r => ({
+            input: r.input,
+            passed: r.passed,
+            expected: 'expected' in r && typeof r.expected === 'boolean' ? (r.expected ? 'match' : 'no match') : undefined,
+            actual: 'actual' in r && typeof r.actual === 'boolean' ? (r.actual ? 'matched' : 'did not match') : undefined,
+          })),
+        } : undefined;
+
         return {
           success: result.success,
           ...(result.aborted ? { aborted: true } : {}),
@@ -119,6 +132,7 @@ Provide example strings that should match and should NOT match. The tool will it
           flags: result.flags,
           iterations: result.iterations,
           runtime: result.runtime,
+          testResults: testResultsSummary,
           example:
             runtime === "python"
               ? `import re\npattern = r"${result.pattern}"\nif re.search(pattern, text):\n    print("Match!")`
@@ -216,6 +230,24 @@ Provide test cases with input strings and the expected captured groups. The tool
           agent.sandboxId = result.sandboxId;
         }
 
+        // Build test results summary for UI (not sent to AI context)
+        const testResultsSummary = result.testResults ? {
+          passed: result.testResults.passedCount,
+          failed: result.testResults.failedCount,
+          total: result.testResults.total,
+          mode: 'capture' as const,
+          details: result.testResults.results.map(r => {
+            // Type guard for capture results
+            const captureResult = r as { input: string; passed: boolean; expected?: (string | null)[]; actual?: (string | null)[] | null };
+            return {
+              input: captureResult.input,
+              passed: captureResult.passed,
+              expected: captureResult.expected,
+              actual: captureResult.actual,
+            };
+          }),
+        } : undefined;
+
         return {
           success: result.success,
           ...(result.aborted ? { aborted: true } : {}),
@@ -223,6 +255,7 @@ Provide test cases with input strings and the expected captured groups. The tool
           flags: result.flags,
           iterations: result.iterations,
           runtime: result.runtime,
+          testResults: testResultsSummary,
           example:
             runtime === "python"
               ? `import re\npattern = r"${result.pattern}"\nmatch = re.search(pattern, text)\nif match:\n    groups = match.groups()  # Captured values`
@@ -436,7 +469,7 @@ export function createTools(
   return {
     generateMatchRegex: createGenerateMatchRegexTool(gateway, emitSubagentStatus),
     generateCaptureRegex: createGenerateCaptureRegexTool(gateway, emitSubagentStatus),
-    generateCode: createGenerateCodeTool(gateway),
+    // generateCode: createGenerateCodeTool(gateway),
   } satisfies ToolSet;
 }
 

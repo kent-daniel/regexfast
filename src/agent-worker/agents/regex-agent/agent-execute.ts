@@ -3,63 +3,33 @@
  * 
  * This step executes the generated regex pattern against test cases
  * in an isolated sandbox environment to verify correctness.
+ * 
+ * This module wraps the core regex-executor with agent-specific logging.
  */
 
 import type { Sandbox } from "@daytonaio/sdk";
 
-import { executeInSandbox } from "../../sandbox";
-import { 
-  buildJsTestScript, 
-  buildPythonTestScript, 
-  buildJsCaptureTestScript, 
-  buildPythonCaptureTestScript,
-} from "./test-scripts";
+import {
+  executeRegexTest,
+  type TestInput,
+  type TestResult,
+  type CaptureTestCaseResult,
+} from "../../lib/regex-executor";
 import { SANDBOX_TIMEOUT_SECONDS } from "./constants";
 import {
   isCaptureMode,
   type RegexRequest,
   type RegexCandidate,
-  type TestResult,
   type SandboxRuntime,
-  type CaptureTestCaseResult,
-  type TestMode,
 } from "./types";
 
-// ─────────────────────────────────────────────────────────────
-// Error result factory
-// ─────────────────────────────────────────────────────────────
-
-/** Error types for consistent error reporting */
-type ErrorType = "SANDBOX" | "PARSE" | "TIMEOUT";
-
-/**
- * Create a standardized error result for test failures
- * @param errorType - The type of error that occurred
- * @param message - The error message
- * @param mode - The test mode (match or capture)
- * @param stdout - Optional stdout from sandbox
- * @returns A TestResult indicating failure
- */
-function createErrorResult(
-  errorType: ErrorType,
-  message: string,
-  mode: TestMode,
-  stdout?: string
-): TestResult {
-  return {
-    passed: false,
-    total: 0,
-    passedCount: 0,
-    failedCount: 0,
-    results: [],
-    testMode: mode,
-    stdout,
-    compileError: `${errorType} ERROR: ${message}`,
-  };
-}
+// Re-export TestResult for backwards compatibility
+export type { TestResult } from "../../lib/regex-executor";
 
 /**
  * Execute regex tests in a Daytona sandbox
+ * 
+ * This is the agent-specific wrapper that adds logging around the core executor.
  * 
  * @param sandbox - The Daytona sandbox instance
  * @param candidate - The regex candidate to test
@@ -79,6 +49,7 @@ export async function execute(
   const captureMode = isCaptureMode(request);
   const modeStr = captureMode ? "CAPTURE" : "MATCH";
   
+  // Agent-specific logging
   console.log(`[RegexAgent] EXECUTE: Testing /${candidate.pattern}/${candidate.flags} (${modeStr} mode)`);
   console.log(`[RegexAgent] EXECUTE: Runtime: ${runtime}, Sandbox: ${sandbox.id}`);
   
@@ -88,64 +59,38 @@ export async function execute(
     console.log(`[RegexAgent] EXECUTE: Test cases - shouldMatch: ${request.shouldMatch.length}, shouldNotMatch: ${request.shouldNotMatch.length}`);
   }
 
-  // Build the appropriate test script for the runtime and mode
-  let testScript: string;
-  if (captureMode) {
-    testScript = runtime === "python"
-      ? buildPythonCaptureTestScript(candidate, request.captureTests)
-      : buildJsCaptureTestScript(candidate, request.captureTests);
-  } else {
-    testScript = runtime === "python"
-      ? buildPythonTestScript(candidate, request)
-      : buildJsTestScript(candidate, request);
-  }
-
   console.log(`[RegexAgent] EXECUTE: Running test script in sandbox...`);
   const startTime = Date.now();
 
-  // Execute in Daytona sandbox with configured timeout
-  const response = await executeInSandbox(sandbox, testScript, {
-    timeout: SANDBOX_TIMEOUT_SECONDS,
-    language: runtime,
-    onSandboxRecreated,
-    abortSignal,
-  });
+  // Convert agent request to core test input format
+  const testInput: TestInput = captureMode
+    ? { captureTests: request.captureTests }
+    : { shouldMatch: request.shouldMatch, shouldNotMatch: request.shouldNotMatch };
+
+  // Delegate to core executor
+  const result = await executeRegexTest(
+    sandbox,
+    { pattern: candidate.pattern, flags: candidate.flags },
+    testInput,
+    {
+      runtime: runtime === "typescript" ? "javascript" : runtime,
+      timeout: SANDBOX_TIMEOUT_SECONDS,
+      abortSignal,
+      onSandboxRecreated,
+    }
+  );
 
   const duration = Date.now() - startTime;
   console.log(`[RegexAgent] EXECUTE: Sandbox execution completed in ${duration}ms`);
-  console.log(`[RegexAgent] EXECUTE: Exit code: ${response.exitCode}`);
-
-  // Handle sandbox errors
-  if (response.exitCode !== 0) {
-    console.log(`[RegexAgent] EXECUTE: ❌ Sandbox error: ${response.result} ${response.artifacts?.stdout ? `\nSandbox stdout: ${response.artifacts.stdout}` : ""}`);
-    return createErrorResult(
-      "SANDBOX",
-      response.result,
-      captureMode ? "capture" : "match",
-      response.artifacts?.stdout
-    );
+  
+  // Agent-specific result logging
+  if (captureMode) {
+    logCaptureTestResults(result, candidate);
+  } else {
+    logTestResults(result, candidate);
   }
-
-  // Parse result from sandbox
-  try {
-    const result: TestResult = JSON.parse(response.result);
-    
-    // Log detailed results
-    if (captureMode) {
-      logCaptureTestResults(result, candidate);
-    } else {
-      logTestResults(result, candidate);
-    }
-    
-    return result;
-  } catch {
-    console.log(`[RegexAgent] EXECUTE: ❌ Failed to parse result: ${response.result}`);
-    return createErrorResult(
-      "PARSE",
-      response.result,
-      captureMode ? "capture" : "match"
-    );
-  }
+  
+  return result;
 }
 
 /**
