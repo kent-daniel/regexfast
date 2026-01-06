@@ -5,6 +5,7 @@ import { APPROVAL } from "@/agent-worker/shared";
 import type { SubagentPhase } from "@/agent-worker/shared";
 import { useState, useEffect } from "react";
 import { RegexResultCard } from "./regex-result-card";
+import { useRegexEditorContext } from "@/components/regex-editor/regex-editor-context";
 
 interface ToolInvocationCardProps {
   toolUIPart: ToolUIPart;
@@ -175,6 +176,7 @@ export function ToolInvocationCard({
   onSubmit,
   addToolApprovalResponse
 }: ToolInvocationCardProps) {
+  const { setLatestInitialData } = useRegexEditorContext();
   const toolName = getFriendlyToolName(toolUIPart.type.replace("tool-", ""));
   const rawToolName = toolUIPart.type.replace("tool-", "");
   const isCompleted = toolUIPart.state === "output-available";
@@ -231,6 +233,22 @@ export function ToolInvocationCard({
   };
 
   const phaseLabel = getPhaseLabel(subagentPhase);
+
+  // When a regex tool completes, publish its output for the editor panel.
+  useEffect(() => {
+    if (!isRegex) return;
+    if (!isCompleted) return;
+    if (!("output" in toolUIPart)) return;
+    const regexResult = getRegexResult(toolUIPart.output);
+    if (!regexResult) return;
+
+    setLatestInitialData({
+      pattern: regexResult.pattern,
+      flags: regexResult.flags,
+      runtime: regexResult.runtime,
+      testResults: regexResult.testResults,
+    });
+  }, [isRegex, isCompleted, toolUIPart, setLatestInitialData]);
 
   // Approval Required State - Copilot style
   if (isApprovalRequested || needsApproval) {
