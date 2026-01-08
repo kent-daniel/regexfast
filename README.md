@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# RegexFast
+
+**Generate and Test Regex with AI Agent**
+
+AI coding agent that generates, executes, and evaluates to deliver accurate regex patterns. Automatically tested in a secure sandbox for reliable results.
+
+
+## Features
+
+- 🤖 **AI-Powered Regex Generation** - Intelligent agent generates regex patterns based on your requirements
+- 🧪 **Automated Testing** - Patterns are executed and validated in a secure sandbox environment
+- ⚡ **Real-Time Results** - See matches and test results instantly
+- 💬 **Interactive Chat Interface** - Refine patterns through natural conversation
+- 🎯 **Common Regex Snippets** - Quick access to frequently used patterns
+- 🎨 **Modern UI** - Clean, responsive design built with Next.js and Tailwind CSS
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm/yarn/pnpm/bun
+
+### Installation
 
 ```bash
+# Install dependencies
+npm install
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# For full development (frontend + worker)
+npm run dev:all
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- **Frontend**: Next.js 14 with App Router, React, Tailwind CSS
+- **Backend**: Cloudflare Workers with Durable Objects
+- **AI**: Vercel AI SDK with agent framework
+- **Sandbox**: Secure code execution environment with Daytona
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/              # Next.js app router pages
+├── components/       # React components
+├── agent-worker/     # Cloudflare Worker backend
+├── hooks/           # Custom React hooks
+└── lib/             # Utilities and helpers
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- [Agent Backend Local Development](docs/agent-backend-local-dev.md)
+- [Architecture Decision Records](ADR/)
 
-## Deploy on Vercel
+## Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The application can be deployed on:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **Frontend**: Vercel, Netlify, or Cloudflare Pages
+- **Backend Worker**: Cloudflare Workers
+
+See deployment documentation for platform-specific instructions.
