@@ -14,7 +14,7 @@ const Hero = () => {
       <p className="text-base md:text-lg mb-10 font-normal text-center max-w-2xl text-neutral-400 leading-relaxed">
         Automatically tested in a secure sandbox for reliable results
       </p>
-      {/* <a
+      <a
         href="https://www.producthunt.com/posts/magic-regex-generator?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-magic&#0045;regex&#0045;generator"
         target="_blank"
       >
@@ -25,7 +25,7 @@ const Hero = () => {
           width="250"
           height="54"
         />
-      </a> */}
+      </a>
       <ArrowDownIcon className=" animate-bounce text-neutral-200 size-10 my-3" />
     </div>
   );
