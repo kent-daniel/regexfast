@@ -88,7 +88,7 @@ export function ChatHeader({
 
       {/* Actions */}
       <div className="flex items-center gap-0.5">
-        <Button
+        {/* <Button
           variant="ghost"
           size="icon"
           className="rounded-md h-7 w-7 text-slate-400 hover:text-slate-50 hover:bg-white/10 transition-colors"
@@ -96,7 +96,7 @@ export function ChatHeader({
           title="Toggle debug mode"
         >
           <BugIcon size={14} className={showDebug ? "text-blue-400" : ""} />
-        </Button>
+        </Button> */}
 
         <Button
           variant="ghost"
