@@ -157,6 +157,13 @@ export function useRegexEditor(
 
       const data: RegexTestResponse = await response.json();
 
+      // Check for compile error
+      if (data.compileError) {
+        setError(data.compileError);
+        setResults(undefined);
+        return;
+      }
+
       // Transform API response to TestCaseResult[]
       const testResults: TestCaseResult[] = data.results.map((r) => ({
         input: r.input,

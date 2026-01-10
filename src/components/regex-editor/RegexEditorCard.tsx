@@ -38,6 +38,7 @@ export function RegexEditorCard({ initialData }: RegexEditorCardProps) {
     setRuntime,
     results,
     isLoading,
+    error,
     runTest,
   } = useRegexEditor(initialData);
 
@@ -105,7 +106,7 @@ hello@world.co.uk`}
 
         {/* Results Panel */}
         <div className="flex-1 min-h-[200px] bg-slate-900 overflow-hidden relative z-0">
-            <ResultsPanel results={results} mode={mode} isLoading={isLoading} />
+            <ResultsPanel results={results} mode={mode} isLoading={isLoading} error={error} />
         </div>
       </div>
 

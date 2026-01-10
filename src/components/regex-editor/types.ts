@@ -151,4 +151,6 @@ export interface RegexTestResponse {
   runtime: "javascript" | "python";
   /** Test mode that was used */
   testMode: TestMode;
+  /** Compilation error if the regex pattern failed to compile */
+  compileError?: string;
 }
